@@ -152,6 +152,14 @@
             border-radius: 10px;
             cursor: crosshair;
             background: var(--bg-white);
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .controls {
@@ -353,11 +361,23 @@
             #vennCanvas {
                 width: 100%;
                 max-width: 400px;
+                height: auto;
             }
 
             .controls {
                 flex-direction: column;
                 align-items: center;
+            }
+            
+            .canvas-container {
+                padding: 1rem;
+            }
+        }
+
+        /* Prevent zoom on double tap for mobile */
+        @media (max-width: 768px) {
+            .canvas-container {
+                touch-action: manipulation;
             }
         }
     </style>
@@ -530,16 +550,17 @@
             canvas = document.getElementById('vennCanvas');
             ctx = canvas.getContext('2d');
             
-            // Event listeners
+            // Event listeners for mouse
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
             canvas.addEventListener('mouseout', stopDrawing);
             
-            // Touch events สำหรับมือถือ
-            canvas.addEventListener('touchstart', handleTouch);
-            canvas.addEventListener('touchmove', handleTouch);
-            canvas.addEventListener('touchend', stopDrawing);
+            // Touch events for mobile devices
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+            canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
             
             drawBaseVenn();
         }
@@ -593,9 +614,19 @@
             if (!isDrawing) return;
             
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
             
+            // Calculate position relative to canvas (same as touch)
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            
+            drawAtPosition(x, y);
+        }
+
+        // วาดที่ตำแหน่งที่กำหนด
+        function drawAtPosition(x, y) {
             ctx.globalCompositeOperation = gameData.currentTool === 'highlight' ? 'source-over' : 'destination-out';
             
             if (gameData.currentTool === 'highlight') {
@@ -615,15 +646,50 @@
             isDrawing = false;
         }
 
-        // จัดการ Touch
-        function handleTouch(e) {
+        // Touch event handlers for mobile devices
+        function handleTouchStart(e) {
             e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            canvas.dispatchEvent(mouseEvent);
+            e.stopPropagation();
+            
+            if (e.touches.length === 1) {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                
+                // Calculate position relative to canvas
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                const x = (touch.clientX - rect.left) * scaleX;
+                const y = (touch.clientY - rect.top) * scaleY;
+                
+                isDrawing = true;
+                drawAtPosition(x, y);
+            }
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (isDrawing && e.touches.length === 1) {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                
+                // Calculate position relative to canvas
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                const x = (touch.clientX - rect.left) * scaleX;
+                const y = (touch.clientY - rect.top) * scaleY;
+                
+                drawAtPosition(x, y);
+            }
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            isDrawing = false;
         }
 
         // ตั้งค่าเครื่องมือ
