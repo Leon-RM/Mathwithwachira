@@ -177,6 +177,25 @@
             animation: shake 0.5s ease-in-out;
         }
 
+        /* Touch-specific styles */
+        .draggable-item {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Prevent text selection during drag */
+        body.dragging {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -557,18 +576,32 @@
             const freshDraggables = document.querySelectorAll('.drag-items .draggable-item');
             freshDraggables.forEach(item => {
                 item.setAttribute('draggable', 'true');
+                
+                // Mouse events for desktop
                 item.addEventListener('dragstart', handleDragStart);
                 item.addEventListener('dragend', handleDragEnd);
                 item.addEventListener('mouseenter', handleHintMouseEnter);
                 item.addEventListener('mouseleave', handleHintMouseLeave);
-                item.addEventListener('touchstart', handleHintTouchOrClick, {passive:false});
                 item.addEventListener('click', handleHintTouchOrClick);
+                
+                // Touch events for mobile
+                item.addEventListener('touchstart', handleTouchStart, {passive: false});
+                item.addEventListener('touchmove', handleTouchMove, {passive: false});
+                item.addEventListener('touchend', handleTouchEnd, {passive: false});
+                item.addEventListener('touchcancel', handleTouchCancel, {passive: false});
             });
+            
             dropZones.forEach(zone => {
+                // Mouse events for desktop
                 zone.addEventListener('dragover', handleDragOver);
                 zone.addEventListener('dragenter', handleDragEnter);
                 zone.addEventListener('dragleave', handleDragLeave);
                 zone.addEventListener('drop', handleDrop);
+                
+                // Touch events for mobile
+                zone.addEventListener('touchstart', handleZoneTouchStart, {passive: false});
+                zone.addEventListener('touchmove', handleZoneTouchMove, {passive: false});
+                zone.addEventListener('touchend', handleZoneTouchEnd, {passive: false});
             });
             updateItemUsage();
         }
@@ -634,6 +667,185 @@
             }
             // Re-initialize drag events for pool items (in case DOM changed)
             initializeDragDrop();
+        }
+        
+        // Touch event handlers for mobile devices
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchStartTime = 0;
+        let isDragging = false;
+        let touchDraggedItem = null;
+        let touchStartElement = null;
+        
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchStartTime = Date.now();
+            touchStartElement = e.target;
+            isDragging = false;
+            touchDraggedItem = e.target;
+            
+            // Add visual feedback
+            e.target.style.transform = 'scale(1.1)';
+            e.target.style.zIndex = '1000';
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!touchDraggedItem) return;
+            
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            // Start dragging after moving 10px
+            if (distance > 10 && !isDragging) {
+                isDragging = true;
+                touchDraggedItem.classList.add('dragging');
+                document.body.classList.add('dragging');
+            }
+            
+            if (isDragging) {
+                // Move the dragged item with touch
+                touchDraggedItem.style.position = 'fixed';
+                touchDraggedItem.style.left = (touch.clientX - touchDraggedItem.offsetWidth / 2) + 'px';
+                touchDraggedItem.style.top = (touch.clientY - touchDraggedItem.offsetHeight / 2) + 'px';
+                touchDraggedItem.style.pointerEvents = 'none';
+                
+                // Highlight drop zones
+                const dropZones = document.querySelectorAll('.drop-zone');
+                dropZones.forEach(zone => {
+                    const rect = zone.getBoundingClientRect();
+                    if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                        zone.classList.add('dragover');
+                    } else {
+                        zone.classList.remove('dragover');
+                    }
+                });
+            }
+        }
+        
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (!touchDraggedItem) return;
+            
+            const touch = e.changedTouches[0];
+            const deltaTime = Date.now() - touchStartTime;
+            
+            // If it was a short tap (not a drag), treat as click for hint
+            if (deltaTime < 300 && !isDragging) {
+                handleHintTouchOrClick(e);
+            } else if (isDragging) {
+                // Find the drop zone under the touch
+                const dropZones = document.querySelectorAll('.drop-zone');
+                let targetDropZone = null;
+                
+                dropZones.forEach(zone => {
+                    const rect = zone.getBoundingClientRect();
+                    if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                        targetDropZone = zone;
+                    }
+                    zone.classList.remove('dragover');
+                });
+                
+                if (targetDropZone) {
+                    // Simulate drop
+                    const droppedItems = targetDropZone.querySelector('.dropped-items');
+                    const value = touchDraggedItem.getAttribute('data-value');
+                    const max = itemMaxUsage[value];
+                    const used = itemUsage[value] || 0;
+                    const alreadyExists = Array.from(droppedItems.children).some(
+                        item => item.getAttribute('data-value') === value
+                    );
+                    
+                    if (!alreadyExists && used < max) {
+                        const newItem = touchDraggedItem.cloneNode(true);
+                        newItem.classList.remove('dragging');
+                        newItem.style.margin = '2px';
+                        newItem.style.fontSize = '0.9rem';
+                        newItem.setAttribute('draggable', 'false');
+                        newItem.style.position = 'static';
+                        newItem.style.transform = 'none';
+                        newItem.style.zIndex = 'auto';
+                        newItem.style.pointerEvents = 'auto';
+                        
+                        // Add remove-on-tap for dropped items
+                        newItem.addEventListener('touchstart', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.remove();
+                            hideFixedHintArea();
+                            updateItemUsage();
+                        });
+                        
+                        droppedItems.appendChild(newItem);
+                        updateItemUsage();
+                    }
+                }
+            }
+            
+            // Reset dragged item
+            if (touchDraggedItem) {
+                touchDraggedItem.classList.remove('dragging');
+                touchDraggedItem.style.position = 'static';
+                touchDraggedItem.style.left = 'auto';
+                touchDraggedItem.style.top = 'auto';
+                touchDraggedItem.style.transform = 'none';
+                touchDraggedItem.style.zIndex = 'auto';
+                touchDraggedItem.style.pointerEvents = 'auto';
+            }
+            
+            // Remove body dragging class
+            document.body.classList.remove('dragging');
+            
+            touchDraggedItem = null;
+            isDragging = false;
+            touchStartElement = null;
+        }
+        
+        function handleTouchCancel(e) {
+            e.preventDefault();
+            if (touchDraggedItem) {
+                touchDraggedItem.classList.remove('dragging');
+                touchDraggedItem.style.position = 'static';
+                touchDraggedItem.style.left = 'auto';
+                touchDraggedItem.style.top = 'auto';
+                touchDraggedItem.style.transform = 'none';
+                touchDraggedItem.style.zIndex = 'auto';
+                touchDraggedItem.style.pointerEvents = 'auto';
+            }
+            touchDraggedItem = null;
+            isDragging = false;
+            touchStartElement = null;
+            
+            // Remove body dragging class
+            document.body.classList.remove('dragging');
+            
+            // Remove dragover from all zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.classList.remove('dragover');
+            });
+        }
+        
+        // Touch handlers for drop zones (for visual feedback)
+        function handleZoneTouchStart(e) {
+            // Prevent default to avoid conflicts with item touch handling
+            e.preventDefault();
+        }
+        
+        function handleZoneTouchMove(e) {
+            // This is handled in the item touch move
+            e.preventDefault();
+        }
+        
+        function handleZoneTouchEnd(e) {
+            // This is handled in the item touch end
+            e.preventDefault();
         }
         
         function checkDragDropAnswer() {
@@ -743,6 +955,20 @@
             document.querySelectorAll('.draggable-item.wrong').forEach(item => {
                 item.classList.remove('wrong');
             });
+
+            // Reset any ongoing touch drag
+            if (touchDraggedItem) {
+                touchDraggedItem.classList.remove('dragging');
+                touchDraggedItem.style.position = 'static';
+                touchDraggedItem.style.left = 'auto';
+                touchDraggedItem.style.top = 'auto';
+                touchDraggedItem.style.transform = 'none';
+                touchDraggedItem.style.zIndex = 'auto';
+                touchDraggedItem.style.pointerEvents = 'auto';
+            }
+            touchDraggedItem = null;
+            isDragging = false;
+            touchStartElement = null;
 
             // Restore the drag pool (if needed)
             const dragItems = document.querySelector('.drag-items');
