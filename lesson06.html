@@ -537,12 +537,28 @@
             }
         ];
 
-        // เริ่มต้นเกม
+        // Add a reference to the check and finish buttons
+        let checkBtn, finishBtn;
+        
+        // Modify initGame to cache button references
         function initGame() {
             loadProgress();
             initCanvas();
             loadQuestion();
             updateUI();
+            checkBtn = document.querySelector('.btn.btn-primary[onclick="checkAnswer()"]');
+            finishBtn = document.getElementById('finishLessonBtn');
+            if (!finishBtn) {
+                // Add finish button if not present
+                const btns = document.querySelector('.buttons');
+                finishBtn = document.createElement('button');
+                finishBtn.className = 'btn btn-primary';
+                finishBtn.id = 'finishLessonBtn';
+                finishBtn.textContent = '🎉 เสร็จสิ้นบทเรียน';
+                finishBtn.style.display = 'none';
+                finishBtn.onclick = finishGame;
+                btns.appendChild(finishBtn);
+            }
         }
 
         // ตั้งค่า Canvas
@@ -746,6 +762,9 @@
             document.getElementById('resultMessage').style.display = 'none';
             // ซ่อนคำใบ้
             hideHint();
+            // Re-enable check button and hide finish button if not complete
+            if (checkBtn) checkBtn.disabled = false;
+            if (finishBtn) finishBtn.style.display = 'none';
         }
 
         // ตรวจคำตอบ
@@ -799,11 +818,19 @@
 
             // More forgiving: at least 65% of the correct region colored, and less than 20% over-coloring
             if (percent > 0.65 && overPercent < 0.2) {
-                gameData.gameScore++;
+                // Only increment score if not already maxed
+                if (gameData.gameScore < gameData.totalQuestions) {
+                    gameData.gameScore++;
+                }
                 updateScore();
                 resultMessage.textContent = `✅ ยอดเยี่ยม! ${question.description}`;
                 resultMessage.className = 'result-message success';
                 playSound('success');
+                // If all questions are correct, lock score and buttons
+                if (gameData.gameScore >= gameData.totalQuestions) {
+                    if (checkBtn) checkBtn.disabled = true;
+                    if (finishBtn) finishBtn.style.display = '';
+                }
             } else {
                 resultMessage.textContent = `❌ ยังไม่ถูกต้อง ลองใหม่อีกครั้ง! (${Math.round(percent*100)}% ตรงกับคำตอบ, พื้นที่เกิน ${Math.round(overPercent*100)}%)`;
                 resultMessage.className = 'result-message error';
@@ -822,6 +849,9 @@
                 finishGame();
             }
             hideHint();
+            // Re-enable check button and hide finish button if not complete
+            if (checkBtn) checkBtn.disabled = false;
+            if (finishBtn) finishBtn.style.display = 'none';
         }
 
         // จบเกม
@@ -869,6 +899,9 @@
             updateScore();
             playSound('click');
             hideHint();
+            // Re-enable check button and hide finish button
+            if (checkBtn) checkBtn.disabled = false;
+            if (finishBtn) finishBtn.style.display = 'none';
         }
 
         // อัปเดตคะแนน
