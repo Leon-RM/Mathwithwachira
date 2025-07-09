@@ -445,7 +445,8 @@
             gameScore: 0,
             currentProblem: 0,
             totalProblems: 5,
-            hintsUsed: 0
+            hintsUsed: 0,
+            correctProblems: [false, false, false, false, false] // Track if each problem is already correct
         };
 
         // โจทย์ปัญหา
@@ -653,7 +654,11 @@
             const resultMessage = document.getElementById('resultMessage');
             
             if (allCorrect) {
-                gameData.gameScore++;
+                // Only increment score the first time this problem is answered correctly
+                if (!gameData.correctProblems[gameData.currentProblem]) {
+                    gameData.gameScore++;
+                    gameData.correctProblems[gameData.currentProblem] = true;
+                }
                 resultMessage.textContent = '🎉 ยอดเยี่ยม! คำตอบถูกต้องทั้งหมด!';
                 resultMessage.className = 'result-message success';
                 playSound('success');
@@ -663,6 +668,8 @@
                     document.getElementById('finishLessonBtn').style.display = '';
                 }
             } else {
+                // If user makes a mistake after previously getting it correct, do not decrease score
+                gameData.correctProblems[gameData.currentProblem] = false;
                 const correctAnswers = problem.answers.join(', ');
                 resultMessage.textContent = `❌ คำตอบที่ถูกต้อง: ${correctAnswers}`;
                 resultMessage.className = 'result-message error';
@@ -704,6 +711,7 @@
             gameData.currentProblem = 0;
             gameData.gameScore = 0;
             gameData.hintsUsed = 0;
+            gameData.correctProblems = [false, false, false, false, false];
             
             loadProblem();
             updateScore();
