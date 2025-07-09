@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 8: การประยุกต์ใช้เซต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .lesson-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .xp-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .theory-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .theory-card h3 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .theory-content {
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .example-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .problem-container {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .problem-title {
+            color: #667eea;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .problem-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-data {
+            background: #e8eeff;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .answer-section {
+            margin-top: 2rem;
+        }
+
+        .answer-input {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .answer-input label {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 100px;
+        }
+
+        .answer-input input {
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 200px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .answer-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .hint-section {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .hint-title {
+            color: #f57c00;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #667eea;
+            margin: 2rem 0;
+            font-weight: 600;
+        }
+
+        .problem-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .problem-indicator {
+            font-size: 1.1rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .result-message {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .result-message.success {
+            background: #e8f5e8;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+        }
+
+        .result-message.error {
+            background: #ffebee;
+            color: #f44336;
+            border: 2px solid #f44336;
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .lesson-title {
+                font-size: 2rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .answer-input {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .answer-input label {
+                min-width: auto;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <h1 class="lesson-title">🎯 บทที่ 8: การประยุกต์ใช้เซต</h1>
+            <div class="xp-display">
+                <span id="xp-display">XP: 0</span>
+            </div>
+        </div>
+
+        <div class="theory-card">
+            <h3>🌟 การประยุกต์ใช้เซตในชีวิตจริง</h3>
+            <div class="theory-content">
+                <p><strong>เซตมีประโยชน์มากมายในการแก้ปัญหาจริง</strong> เช่น การจัดกลุ่ม การสำรวจ และการวิเคราะห์ข้อมูล</p>
+                
+                <div class="example-box">
+                    <strong>1. การสำรวจความชอบ</strong><br>
+                    ใช้แผนภาพเวนน์แสดงความชอบในกีฬา ภาพยนตร์ หรืออาหาร<br>
+                    ตัวอย่าง: นักเรียนที่ชอบฟุตบอลและบาสเกตบอล
+                </div>
+
+                <div class="example-box">
+                    <strong>2. การจัดหมวดหมู่สินค้า</strong><br>
+                    แยกประเภทสินค้าตามลักษณะต่างๆ<br>
+                    ตัวอย่าง: อุปกรณ์อิเล็กทรอนิกส์ที่เป็นทั้งมือถือและกล้อง
+                </div>
+
+                <div class="example-box">
+                    <strong>3. การวิเคราะห์ข้อมูลนักเรียน</strong><br>
+                    จัดกลุ่มนักเรียนตามวิชาที่เรียน หรือกิจกรรมที่เข้าร่วม<br>
+                    ตัวอย่าง: นักเรียนที่เข้าร่วมชุมนุมดนตรีและกีฬา
+                </div>
+
+                <div class="example-box">
+                    <strong>สูตรสำคัญ:</strong><br>
+                    • |A ∪ B| = |A| + |B| - |A ∩ B|<br>
+                    • |A - B| = |A| - |A ∩ B|<br>
+                    • |A'| = |U| - |A|
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <h2 class="game-title">🎮 แก้โจทย์ปัญหาจริง</h2>
+            
+            <div class="score-display">
+                คะแนน: <span id="gameScore">0</span> / 5
+            </div>
+
+            <div class="problem-nav">
+                <div class="problem-indicator">
+                    โจทย์ที่ <span id="currentProblem">1</span> จาก 5
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-warning" onclick="showHint()" id="hintBtn">💡 ดูคำใบ้</button>
+                </div>
+            </div>
+
+            <div class="problem-container">
+                <div class="problem-title" id="problemTitle">
+                    โจทย์ที่ 1: การสำรวจความชอบกีฬา
+                </div>
+                <div class="problem-content" id="problemContent">
+                    ในโรงเรียนแห่งหนึ่งมีการสำรวจความชอบกีฬาของนักเรียน 100 คน พบว่า:
+                    <div class="problem-data">
+                        • นักเรียนที่ชอบฟุตบอล 60 คน<br>
+                        • นักเรียนที่ชอบบาสเกตบอล 45 คน<br>
+                        • นักเรียนที่ชอบทั้งฟุตบอลและบาสเกตบอล 25 คน
+                    </div>
+                    จงหา:
+                </div>
+
+                <div class="answer-section">
+                    <div class="answer-input">
+                        <label>a) นักเรียนที่ชอบกีฬาอย่างน้อย 1 ประเภท:</label>
+                        <input type="number" id="answer1" placeholder="คน">
+                    </div>
+                    <div class="answer-input">
+                        <label>b) นักเรียนที่ชอบเฉพาะฟุตบอล:</label>
+                        <input type="number" id="answer2" placeholder="คน">
+                    </div>
+                    <div class="answer-input">
+                        <label>c) นักเรียนที่ไม่ชอบกีฬาทั้งสองประเภท:</label>
+                        <input type="number" id="answer3" placeholder="คน">
+                    </div>
+                </div>
+
+                <div class="hint-section" id="hintSection">
+                    <div class="hint-title">💡 คำใบ้:</div>
+                    <div id="hintContent">
+                        ใช้สูตร |A ∪ B| = |A| + |B| - |A ∩ B|<br>
+                        - A = เซตนักเรียนที่ชอบฟุตบอล<br>
+                        - B = เซตนักเรียนที่ชอบบาสเกตบอล<br>
+                        - A ∩ B = นักเรียนที่ชอบทั้งสองประเภท
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+
+            <div class="buttons">
+                <button class="btn btn-primary" onclick="checkAnswers()">🎯 ตรวจคำตอบ</button>
+                <button class="btn btn-secondary" onclick="nextProblem()">➡️ โจทย์ถัดไป</button>
+                <button class="btn btn-secondary" onclick="resetGame()">🔄 เริ่มใหม่</button>
+                <button class="btn btn-secondary" onclick="goHome()">🏠 กลับเมนู</button>
+                <button class="btn btn-primary" id="finishLessonBtn" onclick="finishLesson()" style="display:none;">🎉 เสร็จสิ้นบทเรียน</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลเกม
+        let gameData = {
+            gameScore: 0,
+            currentProblem: 0,
+            totalProblems: 5,
+            hintsUsed: 0
+        };
+
+        // โจทย์ปัญหา
+        const problems = [
+            {
+                title: "โจทย์ที่ 1: การสำรวจความชอบกีฬา",
+                content: `ในโรงเรียนแห่งหนึ่งมีการสำรวจความชอบกีฬาของนักเรียน 100 คน พบว่า:
+                    <div class="problem-data">
+                        • นักเรียนที่ชอบฟุตบอล 60 คน<br>
+                        • นักเรียนที่ชอบบาสเกตบอล 45 คน<br>
+                        • นักเรียนที่ชอบทั้งฟุตบอลและบาสเกตบอล 25 คน
+                    </div>
+                    จงหา:`,
+                questions: [
+                    "a) นักเรียนที่ชอบกีฬาอย่างน้อย 1 ประเภท:",
+                    "b) นักเรียนที่ชอบเฉพาะฟุตบอล:",
+                    "c) นักเรียนที่ไม่ชอบกีฬาทั้งสองประเภท:"
+                ],
+                answers: [80, 35, 20],
+                hint: `ใช้สูตร |A ∪ B| = |A| + |B| - |A ∩ B|<br>
+                    - A = เซตนักเรียนที่ชอบฟุตบอล<br>
+                    - B = เซตนักเรียนที่ชอบบาสเกตบอล<br>
+                    - A ∩ B = นักเรียนที่ชอบทั้งสองประเภท`
+            },
+            {
+                title: "โจทย์ที่ 2: การจัดหมวดหมู่หนังสือ",
+                content: `ห้องสมุดมีหนังสือทั้งหมด 200 เล่ม จำแนกเป็น:
+                    <div class="problem-data">
+                        • หนังสือนิยาย 120 เล่ม<br>
+                        • หนังสือวิทยาศาสตร์ 95 เล่ม<br>
+                        • หนังสือที่เป็นทั้งนิยายวิทยาศาสตร์ 35 เล่ม
+                    </div>
+                    จงหา:`,
+                questions: [
+                    "a) หนังสือที่เป็นนิยายหรือวิทยาศาสตร์:",
+                    "b) หนังสือที่เป็นเฉพาะวิทยาศาสตร์:",
+                    "c) หนังสือประเภทอื่นๆ:"
+                ],
+                answers: [180, 60, 20],
+                hint: `คิดว่าหนังสือแต่ละประเภทเป็นเซต<br>
+                    - A = เซตหนังสือนิยาย<br>
+                    - B = เซตหนังสือวิทยาศาสตร์<br>
+                    - หนังสือประเภทอื่น = ทั้งหมด - (A ∪ B)`
+            },
+            {
+                title: "โจทย์ที่ 3: การเลือกวิชาเสริม",
+                content: `นักเรียนชั้น ม.3 จำนวน 150 คน สามารถเลือกวิชาเสริมได้ดังนี้:
+                    <div class="problem-data">
+                        • เลือกดนตรี 75 คน<br>
+                        • เลือกศิลปะ 90 คน<br>
+                        • เลือกทั้งดนตรีและศิลปะ 40 คน
+                    </div>
+                    จงหา:`,
+                questions: [
+                    "a) นักเรียนที่เลือกวิชาเสริม:",
+                    "b) นักเรียนที่เลือกเฉพาะศิลปะ:",
+                    "c) นักเรียนที่ไม่เลือกวิชาเสริม:"
+                ],
+                answers: [125, 50, 25],
+                hint: `ใช้หลักการของเซตรวม<br>
+                    - ดนตรี ∪ ศิลปะ = ดนตรี + ศิลปะ - ทั้งคู่<br>
+                    - เฉพาะศิลปะ = ศิลปะ - ทั้งคู่<br>
+                    - ไม่เลือก = ทั้งหมด - (ดนตรี ∪ ศิลปะ)`
+            },
+            {
+                title: "โจทย์ที่ 4: การเลือกวิชาเลือกเสรี",
+                content: `นักเรียนชั้น ม.4 จำนวน 100 คน สามารถเลือกวิชาเลือกเสรีได้ดังนี้:
+                    <div class="problem-data">
+                        • เลือกภาษาจีน 45 คน<br>
+                        • เลือกภาษาญี่ปุ่น 40 คน<br>
+                        • เลือกภาษาฝรั่งเศส 35 คน<br>
+                        • เลือกทั้งภาษาจีนและญี่ปุ่น 15 คน<br>
+                        • เลือกทั้งภาษาจีนและฝรั่งเศส 12 คน<br>
+                        • เลือกทั้งภาษาญี่ปุ่นและฝรั่งเศส 10 คน<br>
+                        • เลือกทั้งสามภาษา 5 คน
+                    </div>
+                    จงหา:`,
+                questions: [
+                    "a) นักเรียนที่เลือกวิชาเลือกเสรี:",
+                    "b) นักเรียนที่เลือกเฉพาะภาษาญี่ปุ่น:",
+                    "c) นักเรียนที่ไม่เลือกวิชาเลือกเสรี:"
+                ],
+                answers: [88, 20, 12],
+                hint: `ใช้สูตรเซตสามเซต:<br>
+                    |A ∪ B ∪ C| = |A| + |B| + |C| - |A ∩ B| - |A ∩ C| - |B ∩ C| + |A ∩ B ∩ C|<br>
+                    เฉพาะญี่ปุ่น = ญี่ปุ่น - (ที่ทับกับจีน) - (ที่ทับกับฝรั่งเศส) + (ที่ทับทั้งสาม)<br>
+                    = 40 - 15 - 10 + 5 = 20`
+            },
+            {
+                title: "โจทย์ที่ 5: การเข้าร่วมกิจกรรมกีฬา",
+                content: `นักเรียนชั้น ม.5 จำนวน 150 คน เข้าร่วมกิจกรรมกีฬาดังนี้:
+                    <div class="problem-data">
+                        • เข้าร่วมฟุตบอล 58 คน<br>
+                        • เข้าร่วมบาสเกตบอล 52 คน<br>
+                        • เข้าร่วมวอลเลย์บอล 48 คน<br>
+                        • เข้าร่วมทั้งฟุตบอลและบาสเกตบอล 18 คน<br>
+                        • เข้าร่วมทั้งฟุตบอลและวอลเลย์บอล 15 คน<br>
+                        • เข้าร่วมทั้งบาสเกตบอลและวอลเลย์บอล 12 คน<br>
+                        • เข้าร่วมทั้งสามกีฬา 8 คน
+                    </div>
+                    จงหา:`,
+                questions: [
+                    "a) นักเรียนที่เข้าร่วมกิจกรรมกีฬา:",
+                    "b) นักเรียนที่เข้าร่วมเฉพาะฟุตบอล:",
+                    "c) นักเรียนที่ไม่เข้าร่วมกิจกรรมกีฬา:"
+                ],
+                answers: [121, 33, 29],
+                hint: `ใช้หลักการเซตสามเซต<br>
+                    เฉพาะฟุตบอล = ฟุตบอล - (ที่ทับกับบาสเกตบอล) - (ที่ทับกับวอลเลย์บอล) + (ที่ทับทั้งสาม)<br>
+                    = 58 - 18 - 15 + 8 = 33`
+            }
+        ];
+
+        // XP SYSTEM: Sync with localStorage and update live
+        function getXP() {
+            return parseInt(localStorage.getItem('setTheoryXP') || '0', 10);
+        }
+        function setXP(xp) {
+            localStorage.setItem('setTheoryXP', xp);
+            updateXPDisplay();
+        }
+        function addXP(amount) {
+            let xp = getXP();
+            xp += amount;
+            setXP(xp);
+        }
+        function updateXPDisplay() {
+            const xp = getXP();
+            const el = document.getElementById('currentXP');
+            if (el) el.textContent = xp;
+            const el2 = document.getElementById('xp-display');
+            if (el2) el2.textContent = `XP: ${xp}`;
+        }
+        window.addEventListener('DOMContentLoaded', updateXPDisplay);
+
+        // เริ่มต้นเกม
+        function initGame() {
+            loadProgress();
+            loadProblem();
+            updateUI();
+        }
+
+        // โหลดโจทย์
+        function loadProblem() {
+            const problem = problems[gameData.currentProblem];
+            
+            document.getElementById('problemTitle').textContent = problem.title;
+            document.getElementById('problemContent').innerHTML = problem.content;
+            document.getElementById('currentProblem').textContent = gameData.currentProblem + 1;
+            
+            // สร้าง input สำหรับคำตอบ
+            const answerSection = document.querySelector('.answer-section');
+            answerSection.innerHTML = '';
+            
+            problem.questions.forEach((question, index) => {
+                const div = document.createElement('div');
+                div.className = 'answer-input';
+                div.innerHTML = `
+                    <label>${question}</label>
+                    <input type="number" id="answer${index + 1}" placeholder="คน">
+                `;
+                answerSection.appendChild(div);
+            });
+            
+            // อัปเดตคำใบ้
+            document.getElementById('hintContent').innerHTML = problem.hint;
+            document.getElementById('hintSection').style.display = 'none';
+            
+            // ซ่อนผลลัพธ์
+            document.getElementById('resultMessage').style.display = 'none';
+        }
+
+        // แสดงคำใบ้
+        function showHint() {
+            const hintSection = document.getElementById('hintSection');
+            if (hintSection.style.display === 'none') {
+                hintSection.style.display = 'block';
+                gameData.hintsUsed++;
+                playSound('click');
+            } else {
+                hintSection.style.display = 'none';
+            }
+        }
+
+        // ตรวจคำตอบ
+        function checkAnswers() {
+            const problem = problems[gameData.currentProblem];
+            const userAnswers = [];
+            let allCorrect = true;
+            
+            // เก็บคำตอบของผู้ใช้
+            for (let i = 0; i < problem.answers.length; i++) {
+                const input = document.getElementById(`answer${i + 1}`);
+                const value = parseInt(input.value) || 0;
+                userAnswers.push(value);
+                
+                if (value !== problem.answers[i]) {
+                    allCorrect = false;
+                    input.style.borderColor = '#f44336';
+                } else {
+                    input.style.borderColor = '#4CAF50';
+                }
+            }
+            
+            const resultMessage = document.getElementById('resultMessage');
+            
+            if (allCorrect) {
+                gameData.gameScore++;
+                resultMessage.textContent = '🎉 ยอดเยี่ยม! คำตอบถูกต้องทั้งหมด!';
+                resultMessage.className = 'result-message success';
+                playSound('success');
+
+                // If all problems are finished, show finish button
+                if (gameData.gameScore === gameData.totalProblems) {
+                    document.getElementById('finishLessonBtn').style.display = '';
+                }
+            } else {
+                const correctAnswers = problem.answers.join(', ');
+                resultMessage.textContent = `❌ คำตอบที่ถูกต้อง: ${correctAnswers}`;
+                resultMessage.className = 'result-message error';
+                playSound('error');
+            }
+            
+            resultMessage.style.display = 'block';
+            updateUI();
+            updateScore();
+        }
+
+        // โจทย์ถัดไป
+        function nextProblem() {
+            if (gameData.currentProblem < gameData.totalProblems - 1) {
+                gameData.currentProblem++;
+                gameData.hintsUsed = 0;
+                loadProblem();
+                playSound('click');
+            } else {
+                finishGame();
+            }
+        }
+
+        // จบเกม
+        function finishGame() {
+            const resultMessage = document.getElementById('resultMessage');
+            resultMessage.textContent = `🎯 เสร็จสิ้นทุกโจทย์! คุณทำถูก ${gameData.gameScore} จาก ${gameData.totalProblems} ข้อ`;
+            resultMessage.className = 'result-message success';
+            resultMessage.style.display = 'block';
+            
+            if (gameData.gameScore >= 4) {
+                showConfetti();
+                playSound('complete');
+            }
+        }
+
+        // รีเซ็ตเกม
+        function resetGame() {
+            gameData.currentProblem = 0;
+            gameData.gameScore = 0;
+            gameData.hintsUsed = 0;
+            
+            loadProblem();
+            updateScore();
+            playSound('click');
+        }
+
+        // อัปเดตคะแนน
+        function updateScore() {
+            document.getElementById('gameScore').textContent = gameData.gameScore;
+        }
+
+        // อัปเดต UI
+        function updateUI() {
+            document.getElementById('progressFill').style.width = '100%'; // 8/8 lessons
+        }
+
+        // โหลดความคืบหน้า
+        function loadProgress() {
+            // This function is kept for compatibility but no longer needed
+        }
+
+        // บันทึกความคืบหน้า
+        function saveProgress() {
+            // This function is kept for compatibility but no longer needed
+        }
+
+        // เล่นเสียง
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'success':
+                    oscillator.frequency.value = 659.25;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                    
+                case 'complete':
+                    // เสียงเสร็จสิ้นโครงการ
+                    oscillator.frequency.value = 523.25;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    
+                    setTimeout(() => {
+                        const osc2 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        osc2.frequency.value = 659.25;
+                        osc2.type = 'sine';
+                        gain2.gain.value = 0.3;
+                        osc2.start();
+                        osc2.stop(audioContext.currentTime + 0.2);
+                        
+                        setTimeout(() => {
+                            const osc3 = audioContext.createOscillator();
+                            const gain3 = audioContext.createGain();
+                            osc3.connect(gain3);
+                            gain3.connect(audioContext.destination);
+                            osc3.frequency.value = 783.99;
+                            osc3.type = 'sine';
+                            gain3.gain.value = 0.3;
+                            osc3.start();
+                            osc3.stop(audioContext.currentTime + 0.2);
+                        }, 150);
+                    }, 100);
+                    break;
+                    
+                case 'error':
+                    oscillator.frequency.value = 200;
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.value = 0.2;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                    
+                case 'click':
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+            }
+        }
+
+        // แสดง confetti
+        function showConfetti() {
+            const colors = ['#667eea', '#764ba2', '#4CAF50', '#ff6b6b', '#ffd93d'];
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 20);
+            }
+        }
+
+        // กลับหน้าหลัก
+        function goHome() {
+            playSound('click');
+            window.location.href = 'index.html';
+        }
+
+        // เริ่มต้นเมื่อโหลดหน้า
+        window.addEventListener('load', function() {
+            initGame();
+            updateXPDisplay();
+        });
+
+        function finishLesson() {
+            // Only allow if all problems are answered correctly
+            if (gameData.gameScore === gameData.totalProblems) {
+                // Prevent double XP
+                if (localStorage.getItem('lesson8_completed') === 'true') {
+                    alert('คุณได้ทำบทเรียนนี้ไปแล้ว XP จะไม่เพิ่มซ้ำ');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                // Add XP and mark as completed
+                addXP(100);
+                localStorage.setItem('lesson8_completed', 'true');
+                // Sync with index.html if possible
+                if (window.opener && window.opener.setTheoryUtils) {
+                    window.opener.setTheoryUtils.addXP(100);
+                    window.opener.setTheoryUtils.completeLessonFromChild(8);
+                } else if (window.setTheoryUtils) {
+                    window.setTheoryUtils.addXP(100);
+                    window.setTheoryUtils.completeLessonFromChild(8);
+                }
+                showConfetti();
+                document.getElementById('finishLessonBtn').disabled = true;
+                alert('🎉 ยินดีด้วย! คุณเสร็จสิ้นบทเรียนที่ 8 แล้ว\nได้รับ 100 XP!');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                alert('กรุณาตอบให้ถูกต้องครบทุกข้อก่อนเสร็จสิ้นบทเรียน!');
+            }
+        }
+    </script>
+</body>
+</html>

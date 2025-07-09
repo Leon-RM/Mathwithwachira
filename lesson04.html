@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 4: สับเซต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 50%;
+            transition: width 0.3s ease;
+        }
+        .lesson-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .xp-display {
+            font-size: 1.1rem;
+            color: var(--success-color);
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        .theory-card {
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        .theory-card h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .theory-content { line-height: 1.8; color: var(--text-primary); }
+        .example-box {
+            background: var(--bg-light);
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+        .game-container {
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .set-display {
+            display: flex;
+            justify-content: space-around;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        .set-box {
+            background: var(--bg-light);
+            border: 2px solid var(--secondary-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            min-width: 200px;
+            box-shadow: var(--shadow-sm);
+        }
+        .set-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .set-content {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        .elements-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .element-button {
+            background: #fff;
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            user-select: none;
+        }
+        .element-button:hover {
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        .element-button.selected {
+            background: var(--primary-color);
+            color: white;
+        }
+        .element-button.correct {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+        .element-button.incorrect {
+            background: var(--error-color);
+            border-color: var(--error-color);
+            color: white;
+        }
+        .subset-question {
+            background: #f0f4ff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .question-title {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: #f5f5f5;
+            color: var(--text-primary);
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .result-message {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: none;
+        }
+        .result-message.success {
+            background: #d1fae5;
+            color: var(--success-color);
+            border: 2px solid var(--success-color);
+        }
+        .result-message.error {
+            background: #fee2e2;
+            color: var(--error-color);
+            border: 2px solid var(--error-color);
+        }
+        .score-display {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin: 2rem 0;
+            font-weight: 600;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--primary-color);
+            animation: confetti-fall 3s linear infinite;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .lesson-title { font-size: 2rem; }
+            .buttons { flex-direction: column; }
+            .set-display { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <h1 class="lesson-title">🔍 บทที่ 4: สับเซต</h1>
+            <div class="xp-display">
+                <span id="xp-display">XP: 0</span>
+            </div>
+        </div>
+
+        <div class="theory-card">
+            <h3>📊 ทฤษฎีสับเซต</h3>
+            <div class="theory-content">
+                <p><strong>สับเซต (Subset)</strong> คือเซตที่สมาชิกทุกตัวเป็นสมาชิกของเซตอื่นด้วย</p>
+                
+                <div class="example-box">
+                    <strong>คำนิยาม:</strong><br>
+                    A ⊆ B หมายถึง A เป็นสับเซตของ B<br>
+                    ถ้าสมาชิกทุกตัวของ A เป็นสมาชิกของ B ด้วย
+                </div>
+
+                <div class="example-box">
+                    <strong>ตัวอย่าง:</strong><br>
+                    • A = {1, 2} และ B = {1, 2, 3, 4}<br>
+                    • A ⊆ B เพราะ 1 ∈ B และ 2 ∈ B<br>
+                    • C = {1, 5} และ D = {1, 2, 3, 4}<br>
+                    • C ⊄ D เพราะ 5 ∉ D
+                </div>
+
+                <div class="example-box">
+                    <strong>สมบัติสำคัญ:</strong><br>
+                    1. ∅ ⊆ A (เซตว่างเป็นสับเซตของเซตใดๆ)<br>
+                    2. A ⊆ A (เซตเป็นสับเซตของตัวเอง)<br>
+                    3. ถ้า A ⊆ B และ B ⊆ C แล้ว A ⊆ C
+                </div>
+
+                <div class="example-box">
+                    <strong>สัญลักษณ์:</strong><br>
+                    • A ⊆ B หมายถึง A เป็นสับเซตของ B<br>
+                    • A ⊄ B หมายถึง A ไม่เป็นสับเซตของ B<br>
+                    • A ⊂ B หมายถึง A เป็นสับเซตแท้ของ B
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <h2 class="game-title">🎮 เกมสับเซต: เลือกสมาชิกเพื่อสร้างสับเซต</h2>
+            
+            <div class="score-display">
+                คะแนน: <span id="gameScore">0</span> / 5
+            </div>
+
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <svg width="120" height="60" viewBox="0 0 120 60">
+                    <ellipse cx="45" cy="30" rx="30" ry="20" fill="#4f46e5" fill-opacity="0.18"/>
+                    <ellipse cx="75" cy="30" rx="30" ry="20" fill="#06b6d4" fill-opacity="0.18"/>
+                    <text x="38" y="30" font-size="16" fill="#4f46e5" font-weight="bold">A</text>
+                    <text x="80" y="30" font-size="16" fill="#06b6d4" font-weight="bold">B</text>
+                </svg>
+                <div style="color:#64748b;font-size:1rem;">ภาพตัวอย่างเซตและสับเซต</div>
+            </div>
+
+            <div class="set-display">
+                <div class="set-box">
+                    <div class="set-title">เซตเอกภพ U</div>
+                    <div class="set-content">U = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}</div>
+                </div>
+                <div class="set-box">
+                    <div class="set-title">เซตเป้าหมาย</div>
+                    <div class="set-content" id="targetSet">{คู่, ≤6}</div>
+                </div>
+            </div>
+
+            <div class="subset-question">
+                <div class="question-title" id="questionTitle">
+                    คำถามที่ 1: เลือกสมาชิกที่เป็นจำนวนคู่และไม่เกิน 6
+                </div>
+                <div class="elements-container">
+                    <div class="element-button" data-value="1" onclick="toggleElement(this)">1</div>
+                    <div class="element-button" data-value="2" onclick="toggleElement(this)">2</div>
+                    <div class="element-button" data-value="3" onclick="toggleElement(this)">3</div>
+                    <div class="element-button" data-value="4" onclick="toggleElement(this)">4</div>
+                    <div class="element-button" data-value="5" onclick="toggleElement(this)">5</div>
+                    <div class="element-button" data-value="6" onclick="toggleElement(this)">6</div>
+                    <div class="element-button" data-value="7" onclick="toggleElement(this)">7</div>
+                    <div class="element-button" data-value="8" onclick="toggleElement(this)">8</div>
+                    <div class="element-button" data-value="9" onclick="toggleElement(this)">9</div>
+                    <div class="element-button" data-value="10" onclick="toggleElement(this)">10</div>
+                </div>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+
+            <div class="buttons" id="questionButtons">
+                <button class="btn btn-primary" id="checkBtn" onclick="checkSubset()">✅ ตรวจคำตอบ</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;">➡️ ถัดไป</button>
+                <button class="btn btn-primary" id="finishLessonBtn" onclick="finishLesson()" style="display:none;">🎉 เสร็จสิ้นบทเรียน</button>
+                <button class="btn btn-secondary" onclick="resetGame()">🔄 เริ่มใหม่</button>
+                <button class="btn btn-secondary" onclick="goHome()">🏠 กลับเมนู</button>
+            </div>
+
+            <div style="text-align:center;margin-top:1.5rem;display:none;" id="nextBtn">
+                <button class="btn btn-primary" onclick="nextQuestion()">➡️ ถัดไป</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลเกม
+        let gameData = {
+            currentXP: 0,
+            stars: 0,
+            gameScore: 0,
+            currentQuestion: 0,
+            selectedElements: [],
+            totalQuestions: 5
+        };
+
+        // คำถามและคำตอบ
+        const questions = [
+            {
+                title: "คำถามที่ 1: เลือกสมาชิกที่เป็นจำนวนคู่และไม่เกิน 6",
+                target: "{คู่, ≤6}",
+                correctAnswer: [2, 4, 6],
+                explanation: "จำนวนคู่ที่ไม่เกิน 6 คือ 2, 4, 6"
+            },
+            {
+                title: "คำถามที่ 2: เลือกสมาชิกที่เป็นจำนวนคี่และมากกว่า 5",
+                target: "{คี่, >5}",
+                correctAnswer: [7, 9],
+                explanation: "จำนวนคี่ที่มากกว่า 5 คือ 7, 9"
+            },
+            {
+                title: "คำถามที่ 3: เลือกสมาชิกที่หารด้วย 3 ลงตัว",
+                target: "{หาร 3 ลงตัว}",
+                correctAnswer: [3, 6, 9],
+                explanation: "จำนวนที่หารด้วย 3 ลงตัว คือ 3, 6, 9"
+            },
+            {
+                title: "คำถามที่ 4: เลือกสมาชิกที่เป็นจำนวนเฉพาะ",
+                target: "{จำนวนเฉพาะ}",
+                correctAnswer: [2, 3, 5, 7],
+                explanation: "จำนวนเฉพาะคือ 2, 3, 5, 7"
+            },
+            {
+                title: "คำถามที่ 5: เลือกสมาชิกที่มีค่าน้อยกว่า 4",
+                target: "{<4}",
+                correctAnswer: [1, 2, 3],
+                explanation: "จำนวนที่น้อยกว่า 4 คือ 1, 2, 3"
+            }
+        ];
+
+        // เริ่มต้นเกม
+        function initGame() {
+            loadProgress();
+            loadQuestion();
+            updateUI();
+        }
+
+        // โหลดคำถาม
+        function loadQuestion() {
+            const question = questions[gameData.currentQuestion];
+            document.getElementById('questionTitle').textContent = question.title;
+            document.getElementById('targetSet').textContent = question.target;
+
+            // รีเซ็ตการเลือก
+            gameData.selectedElements = [];
+            const elements = document.querySelectorAll('.element-button');
+            elements.forEach(element => {
+                element.classList.remove('selected', 'correct', 'incorrect');
+                element.onclick = function() { toggleElement(this); }; // Enable again
+            });
+
+            // ซ่อนผลลัพธ์
+            document.getElementById('resultMessage').style.display = 'none';
+
+            // Reset buttons
+            document.getElementById('nextBtn').style.display = 'none';
+            document.querySelector('#questionButtons button.btn-primary').style.display = '';
+        }
+
+        // เลือก/ยกเลิกเลือกสมาชิก
+        function toggleElement(element) {
+            const value = parseInt(element.dataset.value);
+            
+            if (element.classList.contains('selected')) {
+                // ยกเลิกการเลือก
+                element.classList.remove('selected');
+                gameData.selectedElements = gameData.selectedElements.filter(v => v !== value);
+            } else {
+                // เลือก
+                element.classList.add('selected');
+                gameData.selectedElements.push(value);
+            }
+            
+            playSound('click');
+        }
+
+        // ตรวจสอบสับเซต
+        function checkSubset() {
+            const question = questions[gameData.currentQuestion];
+            const correctAnswer = question.correctAnswer;
+
+            // เรียงข้อมูลเพื่อเปรียบเทียบ
+            const selectedSorted = [...gameData.selectedElements].sort((a, b) => a - b);
+            const correctSorted = [...correctAnswer].sort((a, b) => a - b);
+
+            const isCorrect = selectedSorted.length === correctSorted.length && 
+                            selectedSorted.every((val, index) => val === correctSorted[index]);
+
+            const resultMessage = document.getElementById('resultMessage');
+            const elements = document.querySelectorAll('.element-button');
+
+            // Disable all element buttons
+            elements.forEach(el => el.onclick = null);
+
+            if (isCorrect) {
+                resultMessage.textContent = `🎉 ถูกต้อง! ${question.explanation}`;
+                resultMessage.className = 'result-message success';
+
+                elements.forEach(element => {
+                    const value = parseInt(element.dataset.value);
+                    if (correctAnswer.includes(value)) {
+                        element.classList.add('correct');
+                    }
+                });
+
+                gameData.gameScore++;
+                playSound('success');
+            } else {
+                resultMessage.textContent = `❌ ไม่ถูกต้อง! ${question.explanation}`;
+                resultMessage.className = 'result-message error';
+
+                elements.forEach(element => {
+                    const value = parseInt(element.dataset.value);
+                    if (correctAnswer.includes(value)) {
+                        element.classList.add('correct');
+                    } else if (gameData.selectedElements.includes(value)) {
+                        element.classList.add('incorrect');
+                    }
+                });
+
+                playSound('error');
+            }
+
+            resultMessage.style.display = 'block';
+
+            // Show next or finish button, hide check button
+            document.getElementById('checkBtn').style.display = 'none';
+            if (gameData.currentQuestion < gameData.totalQuestions - 1) {
+                document.getElementById('nextBtn').style.display = '';
+                document.getElementById('finishLessonBtn').style.display = 'none';
+            } else {
+                document.getElementById('nextBtn').style.display = 'none';
+                document.getElementById('finishLessonBtn').style.display = '';
+            }
+        }
+
+        function nextQuestion() {
+            if (gameData.currentQuestion < gameData.totalQuestions - 1) {
+                gameData.currentQuestion++;
+                loadQuestion();
+                playSound('click');
+                updateScore();
+            }
+        }
+
+        // จบเกม
+        function finishGame() {
+            gameData.currentXP += gameData.gameScore * 30;
+            gameData.stars += Math.floor(gameData.gameScore / 2);
+            
+            const resultMessage = document.getElementById('resultMessage');
+            resultMessage.textContent = `🎯 เสร็จสิ้น! คุณทำถูก ${gameData.gameScore} จาก ${gameData.totalQuestions} ข้อ`;
+            resultMessage.className = 'result-message success';
+            resultMessage.style.display = 'block';
+            
+            if (gameData.gameScore >= 4) {
+                showConfetti();
+                playSound('complete');
+            }
+            
+            // บันทึกความคืบหน้า
+            saveProgress();
+            updateUI();
+        }
+
+        // รีเซ็ตเกม
+        function resetGame() {
+            gameData.currentQuestion = 0;
+            gameData.gameScore = 0;
+            gameData.selectedElements = [];
+            
+            loadQuestion();
+            updateScore();
+            playSound('click');
+        }
+
+        // อัปเดตคะแนน
+        function updateScore() {
+            document.getElementById('gameScore').textContent = gameData.gameScore;
+        }
+
+        // อัปเดต UI
+        function updateUI() {
+            document.getElementById('currentXP').textContent = gameData.currentXP;
+            document.getElementById('currentStars').textContent = gameData.stars;
+            document.getElementById('progressFill').style.width = '50%'; // 4/8 lessons
+        }
+
+        // โหลดความคืบหน้า
+        function loadProgress() {
+            const saved = localStorage.getItem('setTheoryProgress');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                gameData.currentXP = savedData.totalXP || 0;
+                gameData.stars = savedData.totalStars || 0;
+            }
+        }
+
+        // บันทึกความคืบหน้า
+        function saveProgress() {
+            const saved = localStorage.getItem('setTheoryProgress');
+            let progressData = saved ? JSON.parse(saved) : {
+                totalXP: 0,
+                completedLessons: 0,
+                totalStars: 0,
+                lessonProgress: {}
+            };
+
+            progressData.totalXP = gameData.currentXP;
+            progressData.totalStars = gameData.stars;
+            progressData.lessonProgress[4] = {
+                completed: true,
+                xp: gameData.gameScore * 30,
+                stars: Math.floor(gameData.gameScore / 2)
+            };
+
+            // นับบทเรียนที่เสร็จ
+            progressData.completedLessons = Object.keys(progressData.lessonProgress).length;
+
+            localStorage.setItem('setTheoryProgress', JSON.stringify(progressData));
+        }
+
+        // เล่นเสียง
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'success':
+                    oscillator.frequency.value = 659.25; // E5
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                    
+                case 'complete':
+                    // เสียงเมื่อทำเสร็จ
+                    oscillator.frequency.value = 523.25; // C5
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    
+                    setTimeout(() => {
+                        const osc2 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        osc2.frequency.value = 659.25; // E5
+                        osc2.type = 'sine';
+                        gain2.gain.value = 0.3;
+                        osc2.start();
+                        osc2.stop(audioContext.currentTime + 0.2);
+                    }, 100);
+                    break;
+                    
+                case 'error':
+                    oscillator.frequency.value = 200;
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.value = 0.2;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                    
+                case 'click':
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+            }
+        }
+
+        // แสดง confetti
+        function showConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            document.body.appendChild(confetti);
+            const colors = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(c);
+                    setTimeout(() => { c.remove(); }, 3000);
+                }, i * 50);
+            }
+            setTimeout(() => { confetti.remove(); }, 3000);
+        }
+
+        // กลับหน้าหลัก
+        function goHome() {
+            playSound('click');
+            window.location.href = 'index.html';
+        }
+
+        // เสร็จสิ้นบทเรียน
+        function finishLesson() {
+            // Only allow if all questions are answered correctly
+            if (gameData.gameScore === gameData.totalQuestions) {
+                // Prevent double XP
+                if (localStorage.getItem('lesson4_completed') === 'true') {
+                    alert('คุณได้ทำบทเรียนนี้ไปแล้ว XP จะไม่เพิ่มซ้ำ');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                // Add XP and mark as completed
+                let xp = parseInt(localStorage.getItem('setTheoryXP') || '0', 10);
+                xp += 100;
+                localStorage.setItem('setTheoryXP', xp);
+                localStorage.setItem('lesson4_completed', 'true');
+                updateXPDisplay();
+                // Sync with index.html if possible
+                if (window.opener && window.opener.setTheoryUtils) {
+                    window.opener.setTheoryUtils.addXP(100);
+                    window.opener.setTheoryUtils.completeLessonFromChild(4);
+                } else if (window.setTheoryUtils) {
+                    window.setTheoryUtils.addXP(100);
+                    window.setTheoryUtils.completeLessonFromChild(4);
+                }
+                showConfetti();
+                document.getElementById('finishLessonBtn').disabled = true;
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                alert('กรุณาตอบให้ถูกต้องครบทุกข้อก่อนเสร็จสิ้นบทเรียน!');
+            }
+        }
+
+        // XP SYSTEM (same as lesson 1)
+        function getXP() {
+            return parseInt(localStorage.getItem('setTheoryXP') || '0', 10);
+        }
+        function setXP(xp) {
+            localStorage.setItem('setTheoryXP', xp);
+            updateXPDisplay();
+        }
+        function addXP(amount) {
+            let xp = getXP();
+            xp += amount;
+            setXP(xp);
+        }
+        function updateXPDisplay() {
+            const xp = getXP();
+            const el = document.getElementById('xp-display');
+            if (el) el.textContent = `XP: ${xp}`;
+        }
+        window.addEventListener('DOMContentLoaded', updateXPDisplay);
+
+        // Celebration effect (same as lesson 1)
+        function showConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            document.body.appendChild(confetti);
+            const colors = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(c);
+                    setTimeout(() => { c.remove(); }, 3000);
+                }, i * 50);
+            }
+            setTimeout(() => { confetti.remove(); }, 3000);
+        }
+
+        // เริ่มต้นเมื่อโหลดหน้า
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>

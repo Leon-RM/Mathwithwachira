@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 1: เซตและการเขียนเซต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: var(--bg-white);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .lesson-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .theory-card {
+            background: var(--bg-white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .theory-card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theory-card h3 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 20px 0 10px 0;
+        }
+
+        .example-box {
+            background: var(--bg-light);
+            border-left: 4px solid var(--secondary-color);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .example-box h4 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .math-notation {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .game-section {
+            background: var(--bg-white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .game-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .drag-drop-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .drag-items {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .drag-items h4 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .draggable-item {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: move;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .draggable-item:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+        }
+
+        .draggable-item.wrong {
+            background: var(--error-color) !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .drop-zones {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .drop-zone {
+            background: var(--bg-light);
+            border: 2px dashed var(--text-secondary);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary-color);
+            background: #e0e7ff;
+        }
+
+        .drop-zone h4 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .quiz-section {
+            background: var(--bg-white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .quiz-card {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .quiz-card.flipped {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .quiz-option {
+            background: var(--bg-white);
+            border: 2px solid var(--text-secondary);
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .quiz-option.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .quiz-option.correct {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .quiz-option.wrong {
+            background: var(--error-color);
+            color: white;
+            border-color: var(--error-color);
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .feedback.show {
+            opacity: 1;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+            text-align: center;
+        }
+
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--primary-color);
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .drag-drop-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📚 บทที่ 1: เซตและการเขียนเซต</h1>
+            <p>ทำความรู้จักกับแนวคิดพื้นฐานของเซต การเขียนเซต และสัญลักษณ์ต่าง ๆ</p>
+            <div id="xp-display" style="margin-top:12px;font-size:1.1rem;color:#10b981;font-weight:600;">XP: 0</div>
+        </div>
+
+        <!-- ทฤษฎีหลัก -->
+        <div class="lesson-content">
+            <div class="theory-card">
+                <h2>🎯 ทฤษฎีพื้นฐาน</h2>
+                
+                <h3>เซต (Set) คืออะไร?</h3>
+                <p><strong>เซต</strong> คือ การรวบรวมสิ่งต่าง ๆ ที่มีคุณสมบัติเดียวกันเข้าด้วยกัน โดยสิ่งเหล่านั้นเรียกว่า <strong>สมาชิกของเซต</strong></p>
+                
+                <div class="example-box">
+                    <h4>ตัวอย่าง:</h4>
+                    <p>• เซตของเลขคี่ที่น้อยกว่า 10 = {1, 3, 5, 7, 9}</p>
+                    <p>• เซตของสีธงชาติไทย = {แดง, ขาว, น้ำเงิน}</p>
+                    <p>• เซตของจำนวนธรรมชาติ = {1, 2, 3, 4, 5, ...}</p>
+                </div>
+
+                <h3>การเขียนเซต</h3>
+                <p><strong>1. วิธีแจกแจง (Roster Method)</strong> - เขียนสมาชิกทั้งหมดในเซต</p>
+                <div class="math-notation">A = {1, 2, 3, 4, 5}</div>
+                
+                <p><strong>2. วิธีกำหนดสมบัติ (Set-builder Notation)</strong> - ระบุคุณสมบัติของสมาชิก</p>
+                <div class="math-notation">B = {x | x เป็นเลขคู่ และ x < 10}</div>
+                
+                <h3>สัญลักษณ์สำคัญ</h3>
+                <p>• <strong>∈</strong> หมายความว่า "เป็นสมาชิกของ" เช่น 3 ∈ A</p>
+                <p>• <strong>∉</strong> หมายความว่า "ไม่เป็นสมาชิกของ" เช่น 6 ∉ A</p>
+                <p>• <strong>{ }</strong> หรือ <strong>∅</strong> หมายถึง "เซตว่าง"</p>
+                <p>• <strong>ℕ</strong> = จำนวนธรรมชาติ, <strong>ℤ</strong> = จำนวนเต็ม, <strong>ℝ</strong> = จำนวนจริง</p>
+            </div>
+        </div>
+
+        <!-- เกม Drag and Drop -->
+        <div class="game-section">
+            <div class="game-title">🎮 เกม 1: ลากและวางสมาชิกเซต</div>
+            <p style="text-align: center; margin-bottom: 20px;">
+    ลากตัวเลขและสัญลักษณ์ไปใส่ในเซตที่เหมาะสม<br>
+    <strong>หมายเหตุ:</strong> ตัวเลขหนึ่งตัวอาจอยู่ได้มากกว่า 1 เซต
+</p>
+            
+            <div class="drag-drop-area">
+                <div class="drag-items">
+                    <h4>สมาชิกที่ต้องจัดเรียง:</h4>
+                    <div class="draggable-item" draggable="true" data-value="1">1</div>
+                    <div class="draggable-item" draggable="true" data-value="2">2</div>
+                    <div class="draggable-item" draggable="true" data-value="3">3</div>
+                    <div class="draggable-item" draggable="true" data-value="-1">-1</div>
+                    <div class="draggable-item" draggable="true" data-value="0">0</div>
+                    <div class="draggable-item" draggable="true" data-value="π">π</div>
+                    <div class="draggable-item" draggable="true" data-value="1/2">1/2</div>
+                    <div class="draggable-item" draggable="true" data-value="🎾">🎾</div>
+                    <div id="fixed-hint-area" style="display:none;opacity:0;transition:opacity 0.3s;margin-top:18px;padding:16px 18px;background:#f1f5f9;border-radius:10px;min-height:32px;font-size:1.08rem;color:#1e293b;box-shadow:0 1px 4px rgba(0,0,0,0.04);"></div>
+                </div>
+                
+                <div class="drop-zones">
+                    <div class="drop-zone" data-set="natural">
+                        <div>
+                            <h4>ℕ (จำนวนธรรมชาติ)</h4>
+                            <div class="dropped-items" id="natural-items"></div>
+                        </div>
+                    </div>
+                    <div class="drop-zone" data-set="integer">
+                        <div>
+                            <h4>ℤ (จำนวนเต็ม)</h4>
+                            <div class="dropped-items" id="integer-items"></div>
+                        </div>
+                    </div>
+                    <div class="drop-zone" data-set="real">
+                        <div>
+                            <h4>ℝ (จำนวนจริง)</h4>
+                            <div class="dropped-items" id="real-items"></div>
+                        </div>
+                    </div>
+                    <div class="drop-zone" data-set="other">
+                        <div>
+                            <h4>อื่น ๆ</h4>
+                            <div class="dropped-items" id="other-items"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" onclick="checkDragDropAnswer()">ตรวจคำตอบ</button>
+                <button class="btn btn-secondary" onclick="resetDragDrop()">เริ่มใหม่</button>
+            </div>
+            
+            <div class="feedback" id="dragDropFeedback"></div>
+        </div>
+
+        <!-- เกม Quiz Cards -->
+        <div class="quiz-section">
+            <div class="game-title">🎮 เกม 2: การ์ดคำถาม</div>
+            <p style="text-align: center; margin-bottom: 20px;">คลิกที่การ์ดเพื่อดูคำถาม แล้วเลือกคำตอบที่ถูกต้อง</p>
+            
+            <div class="quiz-card" id="quiz1">
+                <div class="quiz-question">คำถาม 1: เซตว่าง คือเซตที่มีสมาชิกเท่าใด?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectQuizOption(1, 0, false)">1 สมาชิก</div>
+                    <div class="quiz-option" onclick="selectQuizOption(1, 1, true)">0 สมาชิก</div>
+                    <div class="quiz-option" onclick="selectQuizOption(1, 2, false)">ไม่มีขีดจำกัด</div>
+                    <div class="quiz-option" onclick="selectQuizOption(1, 3, false)">ไม่สามารถบอกได้</div>
+                </div>
+            </div>
+            
+            <div class="quiz-card" id="quiz2">
+                <div class="quiz-question">คำถาม 2: สัญลักษณ์ ∈ หมายความว่าอะไร?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectQuizOption(2, 0, false)">ไม่เป็นสมาชิกของ</div>
+                    <div class="quiz-option" onclick="selectQuizOption(2, 1, true)">เป็นสมาชิกของ</div>
+                    <div class="quiz-option" onclick="selectQuizOption(2, 2, false)">เท่ากับ</div>
+                    <div class="quiz-option" onclick="selectQuizOption(2, 3, false)">รวมกับ</div>
+                </div>
+            </div>
+            
+            <div class="quiz-card" id="quiz3">
+                <div class="quiz-question">คำถาม 3: A = {x | x เป็นเลขคี่ และ 1 ≤ x ≤ 7} เขียนด้วยวิธีแจกแจงได้เป็น?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectQuizOption(3, 0, false)">{1, 2, 3, 4, 5, 6, 7}</div>
+                    <div class="quiz-option" onclick="selectQuizOption(3, 1, true)">{1, 3, 5, 7}</div>
+                    <div class="quiz-option" onclick="selectQuizOption(3, 2, false)">{2, 4, 6}</div>
+                    <div class="quiz-option" onclick="selectQuizOption(3, 3, false)">{1, 3, 5, 7, 9}</div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" onclick="checkAllQuizAnswers()">ตรวจคำตอบทั้งหมด</button>
+                <button class="btn btn-secondary" onclick="resetQuiz()">เริ่มใหม่</button>
+            </div>
+            
+            <div class="feedback" id="quizFeedback"></div>
+        </div>
+
+        <!-- ปุ่มควบคุม -->
+        <div class="controls">
+            <button class="btn btn-secondary" onclick="goHome()">🏠 กลับเมนูหลัก</button>
+            <button class="btn" onclick="completeLesson()">🎉 เสร็จสิ้นบทเรียน</button>
+        </div>
+    </div>
+
+    <script>
+        // ตัวแปรสำหรับเกม
+        let dragDropCompleted = false;
+        let quizCompleted = false;
+        let quizAnswers = [false, false, false];
+        
+        // เกม Drag and Drop
+        function initializeDragDrop() {
+            const draggables = document.querySelectorAll('.drag-items .draggable-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            // Remove old listeners by cloning (to avoid duplicate listeners)
+            draggables.forEach(item => {
+                const newItem = item.cloneNode(true);
+                item.parentNode.replaceChild(newItem, item);
+            });
+            // Re-select after cloning
+            const freshDraggables = document.querySelectorAll('.drag-items .draggable-item');
+            freshDraggables.forEach(item => {
+                item.setAttribute('draggable', 'true');
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                item.addEventListener('mouseenter', handleHintMouseEnter);
+                item.addEventListener('mouseleave', handleHintMouseLeave);
+                item.addEventListener('touchstart', handleHintTouchOrClick, {passive:false});
+                item.addEventListener('click', handleHintTouchOrClick);
+            });
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+            updateItemUsage();
+        }
+        
+        let draggedItem = null;
+        
+        function handleDragStart(e) {
+            draggedItem = e.target;
+            e.target.classList.add('dragging');
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+        
+        function handleDragEnter(e) {
+            e.target.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.target.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('dragover');
+
+            const dropZone = e.target.closest('.drop-zone');
+            const droppedItems = dropZone.querySelector('.dropped-items');
+
+            if (draggedItem) {
+                // Prevent duplicate in the same drop zone
+                const value = draggedItem.getAttribute('data-value');
+                const max = itemMaxUsage[value];
+                const used = itemUsage[value] || 0;
+                const alreadyExists = Array.from(droppedItems.children).some(
+                    item => item.getAttribute('data-value') === value
+                );
+                // Only allow drop if not exceeding max usage
+                if (!alreadyExists && used < max) {
+                    // Create a copy in the drop zone
+                    const newItem = draggedItem.cloneNode(true);
+                    newItem.classList.remove('dragging');
+                    newItem.style.margin = '2px';
+                    newItem.style.fontSize = '0.9rem';
+                    newItem.setAttribute('draggable', 'false');
+                    // Add remove-on-click for dropped items
+                    newItem.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        this.remove();
+                        hideFixedHintArea();
+                        updateItemUsage();
+                    });
+                    droppedItems.appendChild(newItem);
+                    updateItemUsage();
+                }
+                // Do NOT remove the original from the pool!
+                draggedItem = null;
+            }
+            // Re-initialize drag events for pool items (in case DOM changed)
+            initializeDragDrop();
+        }
+        
+        function checkDragDropAnswer() {
+            const correctAnswers = {
+                'natural': ['1', '2', '3'],
+                'integer': ['1', '2', '3', '-1', '0'],
+                'real': ['1', '2', '3', '-1', '0', 'π', '1/2'],
+                'other': ['🎾']
+            };
+            
+            let allCorrect = true;
+            let totalScore = 0;
+            let feedbackMessages = [];
+            
+            // ตรวจสอบแต่ละเซต
+            Object.keys(correctAnswers).forEach(setType => {
+                const droppedItems = document.querySelectorAll(`#${setType}-items .draggable-item`);
+                const droppedValues = Array.from(droppedItems).map(item => item.getAttribute('data-value'));
+                
+                // หาสมาชิกที่ถูกต้องและผิด
+                const correctInSet = droppedValues.filter(value => correctAnswers[setType].includes(value));
+                const wrongInSet = droppedValues.filter(value => !correctAnswers[setType].includes(value));
+                
+                // หาสมาชิกที่ควรอยู่ในเซตนี้แต่ไม่ได้อยู่
+                const missingFromSet = correctAnswers[setType].filter(value => !droppedValues.includes(value));
+                
+                // คำนวณคะแนน
+                correctInSet.forEach(value => {
+                    totalScore += 10;
+                });
+                
+                // สร้างข้อความ feedback
+                let setFeedback = '';
+                const setNames = {
+                    'natural': 'ℕ (จำนวนธรรมชาติ)',
+                    'integer': 'ℤ (จำนวนเต็ม)',
+                    'real': 'ℝ (จำนวนจริง)',
+                    'other': 'อื่น ๆ'
+                };
+                
+                if (wrongInSet.length > 0) {
+                    setFeedback += `❌ ใน ${setNames[setType]}: ${wrongInSet.join(', ')} ไม่ควรอยู่ที่นี่\n`;
+                    allCorrect = false;
+                }
+                
+                if (missingFromSet.length > 0) {
+                    setFeedback += `⚠️ ใน ${setNames[setType]}: ควรมี ${missingFromSet.join(', ')}\n`;
+                    allCorrect = false;
+                }
+                
+                if (setFeedback) {
+                    feedbackMessages.push(setFeedback);
+                }
+            });
+            
+            const feedback = document.getElementById('dragDropFeedback');
+            
+            if (allCorrect && totalScore >= 70) {
+                feedback.innerHTML = '🎉 ยินดีด้วย! คุณจัดหมวดหมู่ได้ถูกต้อง';
+                feedback.className = 'feedback success show';
+                dragDropCompleted = true;
+                playSuccessSound();
+                showConfetti();
+            } else {
+                // ไฮไลท์ items ที่ผิด
+                highlightWrongItems(correctAnswers);
+                
+                let feedbackText = `❌ ยังไม่ถูกต้อง (คะแนน: ${totalScore}/100)\n\n`;
+                feedbackText += '<strong>สิ่งที่ต้องแก้ไข:</strong>\n';
+                feedbackText += feedbackMessages.join('\n');
+                feedbackText += '\n💡 <strong>คำแนะนำ:</strong>\n';
+                feedbackText += '• ℕ (จำนวนธรรมชาติ): 1, 2, 3, 4, 5, ...\n';
+                feedbackText += '• ℤ (จำนวนเต็ม): ..., -2, -1, 0, 1, 2, ...\n';
+                feedbackText += '• ℝ (จำนวนจริง): จำนวนทั้งหมด รวมถึงเศษส่วนและจำนวนอตรรกยะ\n';
+                feedbackText += '• อื่น ๆ: สิ่งที่ไม่ใช่ตัวเลข';
+                
+                feedback.innerHTML = feedbackText.replace(/\n/g, '<br>');
+                feedback.className = 'feedback error show';
+            }
+        }
+        
+        function highlightWrongItems(correctAnswers) {
+            // ลบ highlighting เก่า
+            document.querySelectorAll('.draggable-item.wrong').forEach(item => {
+                item.classList.remove('wrong');
+            });
+            
+            // ไฮไลท์ items ที่ผิด
+            Object.keys(correctAnswers).forEach(setType => {
+                const droppedItems = document.querySelectorAll(`#${setType}-items .draggable-item`);
+                droppedItems.forEach(item => {
+                    const value = item.getAttribute('data-value');
+                    if (!correctAnswers[setType].includes(value)) {
+                        item.classList.add('wrong');
+                    }
+                });
+            });
+        }
+
+        function resetDragDrop() {
+            // Clear all drop zones
+            document.querySelectorAll('.dropped-items').forEach(container => {
+                container.innerHTML = '';
+            });
+
+            // Remove highlighting
+            document.querySelectorAll('.draggable-item.wrong').forEach(item => {
+                item.classList.remove('wrong');
+            });
+
+            // Restore the drag pool (if needed)
+            const dragItems = document.querySelector('.drag-items');
+            dragItems.innerHTML = `
+                <h4>สมาชิกที่ต้องจัดเรียง:</h4>
+                <div class="draggable-item" draggable="true" data-value="1">1</div>
+                <div class="draggable-item" draggable="true" data-value="2">2</div>
+                <div class="draggable-item" draggable="true" data-value="3">3</div>
+                <div class="draggable-item" draggable="true" data-value="-1">-1</div>
+                <div class="draggable-item" draggable="true" data-value="0">0</div>
+                <div class="draggable-item" draggable="true" data-value="π">π</div>
+                <div class="draggable-item" draggable="true" data-value="1/2">1/2</div>
+                <div class="draggable-item" draggable="true" data-value="🎾">🎾</div>
+                <div id="fixed-hint-area" style="display:none;opacity:0;transition:opacity 0.3s;margin-top:18px;padding:16px 18px;background:#f1f5f9;border-radius:10px;min-height:32px;font-size:1.08rem;color:#1e293b;box-shadow:0 1px 4px rgba(0,0,0,0.04);"></div>
+            `;
+
+            initializeDragDrop();
+
+            const feedback = document.getElementById('dragDropFeedback');
+            feedback.className = 'feedback';
+            dragDropCompleted = false;
+            updateItemUsage();
+            hideFixedHintArea();
+        }
+        
+        // เกม Quiz
+        function selectQuizOption(quizNum, optionIndex, isCorrect) {
+            const quiz = document.getElementById(`quiz${quizNum}`);
+            const options = quiz.querySelectorAll('.quiz-option');
+            
+            // รีเซ็ตสถานะเก่า
+            options.forEach(option => {
+                option.classList.remove('selected', 'correct', 'wrong');
+            });
+            
+            // เลือกคำตอบใหม่
+            options[optionIndex].classList.add('selected');
+            quizAnswers[quizNum - 1] = isCorrect;
+        }
+        
+        function checkAllQuizAnswers() {
+            const allAnswered = quizAnswers.every(answer => answer !== false);
+            const allCorrect = quizAnswers.every(answer => answer === true);
+            
+            // แสดงผลคำตอบที่ถูกต้อง
+            for (let i = 1; i <= 3; i++) {
+                const quiz = document.getElementById(`quiz${i}`);
+                const options = quiz.querySelectorAll('.quiz-option');
+                
+                options.forEach((option, index) => {
+                    if (option.classList.contains('selected')) {
+                        if (quizAnswers[i - 1] === true) {
+                            option.classList.add('correct');
+                        } else {
+                            option.classList.add('wrong');
+                        }
+                    }
+                });
+            }
+            
+            const feedback = document.getElementById('quizFeedback');
+            const correctCount = quizAnswers.filter(answer => answer === true).length;
+            
+            if (allCorrect) {
+                feedback.textContent = `🎉 ยอดเยี่ยม! คุณตอบถูกทั้งหมด ${correctCount}/3 ข้อ`;
+                feedback.className = 'feedback success show';
+                quizCompleted = true;
+                playSuccessSound();
+                showConfetti();
+            } else {
+                feedback.textContent = `📝 คุณตอบถูก ${correctCount}/3 ข้อ ลองใหม่อีกครั้ง`;
+                feedback.className = 'feedback error show';
+            }
+        }
+        
+        function resetQuiz() {
+            quizAnswers = [false, false, false];
+            quizCompleted = false;
+            
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'wrong');
+            });
+            
+            const feedback = document.getElementById('quizFeedback');
+            feedback.className = 'feedback';
+        }
+        
+        // เสียงเอฟเฟ็กต์
+        function playSuccessSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        // แสดง Confetti
+        function showConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            document.body.appendChild(confetti);
+            
+            const colors = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const piece = document.createElement('div');
+                    piece.classList.add('confetti-piece');
+                    piece.style.left = Math.random() * 100 + 'vw';
+                    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.appendChild(piece);
+                }, i * 50);
+            }
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 3000);
+        }
+        
+        // ฟังก์ชันการนำทาง
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+        
+        function completeLesson() {
+            if (dragDropCompleted && quizCompleted) {
+                // เพิ่มคะแนน (local XP)
+                if (!isLessonCompleted(1)) {
+                    addXP(100);
+                    markLessonCompleted(1);
+                    alert('🎉 ยินดีด้วย! คุณเสร็จสิ้นบทเรียนที่ 1 แล้ว\nได้รับ 100 XP!');
+                } else {
+                    alert('คุณได้ทำบทเรียนนี้ไปแล้ว XP จะไม่เพิ่มซ้ำ');
+                }
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                alert('⚠️ กรุณาทำเกมให้ครบทุกข้อก่อนจบบทเรียน');
+            }
+        }
+        
+        // เริ่มต้นเมื่อโหลดหน้า
+        window.addEventListener('load', function() {
+            initializeDragDrop();
+            updateItemUsage();
+            updateXPDisplay();
+            // เอฟเฟ็กต์ fade in
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // --- Fixed hint area logic ---
+        let lastHintValue = null;
+        let hintTimer = null;
+        function showHintInFixedAreaFor(value) {
+            const sets = itemHints[value] || [];
+            const hintArea = document.getElementById('fixed-hint-area');
+            if (!sets.length) return;
+            hintArea.innerHTML = `<strong>เป็นสมาชิกของ:</strong> ${sets.map(s => `<span style='display:inline-block;background:#e0e7ff;color:#4f46e5;padding:2px 10px;border-radius:7px;margin:0 4px;'>${s}</span>`).join('')}`;
+            hintArea.style.display = 'block';
+            setTimeout(() => { hintArea.style.opacity = '1'; }, 10);
+            lastHintValue = value;
+        }
+        function hideFixedHintArea() {
+            const hintArea = document.getElementById('fixed-hint-area');
+            hintArea.style.opacity = '0';
+            setTimeout(() => { hintArea.style.display = 'none'; }, 300);
+            lastHintValue = null;
+        }
+        // Hover logic for desktop
+        function handleHintMouseEnter(e) {
+            const value = e.target.getAttribute('data-value');
+            clearTimeout(hintTimer);
+            hintTimer = setTimeout(() => {
+                showHintInFixedAreaFor(value);
+            }, 2000);
+        }
+        function handleHintMouseLeave(e) {
+            clearTimeout(hintTimer);
+            hideFixedHintArea();
+        }
+        // Touch/click fallback for mobile
+        function handleHintTouchOrClick(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const value = e.target.getAttribute('data-value');
+            if (lastHintValue === value && document.getElementById('fixed-hint-area').style.opacity === '1') {
+                hideFixedHintArea();
+                return;
+            }
+            showHintInFixedAreaFor(value);
+        }
+        document.addEventListener('mousedown', function(e) {
+            const hintArea = document.getElementById('fixed-hint-area');
+            if (!hintArea.contains(e.target) && !e.target.classList.contains('draggable-item')) {
+                hideFixedHintArea();
+            }
+        });
+        document.addEventListener('touchstart', function(e) {
+            const hintArea = document.getElementById('fixed-hint-area');
+            if (!hintArea.contains(e.target) && !e.target.classList.contains('draggable-item')) {
+                hideFixedHintArea();
+            }
+        });
+        // --- Tooltip logic ---
+        const itemHints = {
+            '1': ['ℕ', 'ℤ', 'ℝ'],
+            '2': ['ℕ', 'ℤ', 'ℝ'],
+            '3': ['ℕ', 'ℤ', 'ℝ'],
+            '-1': ['ℤ', 'ℝ'],
+            '0': ['ℤ', 'ℝ'],
+            'π': ['ℝ'],
+            '1/2': ['ℝ'],
+            '🎾': ['อื่น ๆ']
+        };
+        // For usage count: items that can be used more than once
+        const itemMaxUsage = {
+            '1': 3, // can be in 3 sets
+            '2': 3,
+            '3': 3,
+            '-1': 2,
+            '0': 2,
+            'π': 1,
+            '1/2': 1,
+            '🎾': 1
+        };
+        // Track current usage
+        let itemUsage = {};
+        function updateItemUsage() {
+            // Count how many times each item is used in drop zones
+            itemUsage = {};
+            Object.keys(itemMaxUsage).forEach(val => itemUsage[val] = 0);
+            document.querySelectorAll('.dropped-items .draggable-item').forEach(item => {
+                const value = item.getAttribute('data-value');
+                if (itemUsage[value] !== undefined) itemUsage[value]++;
+            });
+            // Update pool item UI
+            document.querySelectorAll('.drag-items .draggable-item').forEach(item => {
+                const value = item.getAttribute('data-value');
+                const max = itemMaxUsage[value];
+                const used = itemUsage[value];
+                // Show badge for usage count if max > 1
+                let badge = item.querySelector('.usage-badge');
+                if (!badge && max > 1) {
+                    badge = document.createElement('span');
+                    badge.className = 'usage-badge';
+                    badge.style.background = '#06b6d4';
+                    badge.style.color = '#fff';
+                    badge.style.fontSize = '0.8em';
+                    badge.style.borderRadius = '8px';
+                    badge.style.padding = '2px 7px';
+                    badge.style.marginLeft = '7px';
+                    badge.style.verticalAlign = 'middle';
+                    item.appendChild(badge);
+                }
+                if (badge) badge.textContent = `${max - used}`;
+                if (max === 1 && used >= 1) {
+                    item.style.opacity = '0.4';
+                    item.style.pointerEvents = 'none';
+                } else if (max > 1 && used >= max) {
+                    item.style.opacity = '0.4';
+                    item.style.pointerEvents = 'none';
+                } else {
+                    item.style.opacity = '1';
+                    item.style.pointerEvents = '';
+                }
+            });
+        }
+
+        // Local XP system (sync with home page)
+        function getXP() {
+            return parseInt(localStorage.getItem('setTheoryXP') || '0', 10);
+        }
+        function setXP(xp) {
+            localStorage.setItem('setTheoryXP', xp);
+            updateXPDisplay();
+        }
+        function addXP(amount) {
+            let xp = getXP();
+            xp += amount;
+            setXP(xp);
+        }
+        function updateXPDisplay() {
+            const xp = getXP();
+            const el = document.getElementById('xp-display');
+            if (el) el.textContent = `XP: ${xp}`;
+        }
+        // Track completed lessons to prevent double XP (sync with home page)
+        function isLessonCompleted(lessonId) {
+            return localStorage.getItem(`lesson${lessonId}_completed`) === 'true';
+        }
+        function markLessonCompleted(lessonId) {
+            localStorage.setItem(`lesson${lessonId}_completed`, 'true');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 3: เซตที่เท่ากัน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 37.5%;
+            transition: width 0.3s ease;
+        }
+        .lesson-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .xp-display {
+            font-size: 1.1rem;
+            color: var(--success-color);
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        .theory-card {
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        .theory-card h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .theory-content { line-height: 1.8; color: var(--text-primary); }
+        .example-box {
+            background: var(--bg-light);
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+        .game-container {
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin: 2rem 0;
+        }
+        .matching-column {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+        .column-title {
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        .matching-item {
+            background: var(--bg-white);
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+            user-select: none;
+        }
+        .matching-item:hover {
+            border-color: var(--primary-color);
+            background: #f0f4ff;
+        }
+        .matching-item.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        .matching-item.correct {
+            border-color: var(--success-color);
+            background: var(--success-color);
+            color: white;
+        }
+        .matching-item.incorrect {
+            border-color: var(--error-color);
+            background: var(--error-color);
+            color: white;
+        }
+        .matching-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .score-display {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin: 2rem 0;
+            font-weight: 600;
+        }
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: #f5f5f5;
+            color: var(--text-primary);
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .result-message {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: none;
+        }
+        .result-message.success {
+            background: #d1fae5;
+            color: var(--success-color);
+            border: 2px solid var(--success-color);
+        }
+        .result-message.error {
+            background: #fee2e2;
+            color: var(--error-color);
+            border: 2px solid var(--error-color);
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--primary-color);
+            animation: confetti-fall 3s linear infinite;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .lesson-title { font-size: 2rem; }
+            .buttons { flex-direction: column; }
+            .matching-container { grid-template-columns: 1fr; gap: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <h1 class="lesson-title">⚖️ บทที่ 3: เซตที่เท่ากัน</h1>
+            <div class="xp-display">
+                <span id="xp-display">XP: 0</span>
+            </div>
+        </div>
+
+        <div class="theory-card">
+            <h3>📐 ทฤษฎีเซตที่เท่ากัน</h3>
+            <div class="theory-content">
+                <p><strong>เซตที่เท่ากัน</strong> คือเซตที่มีสมาชิกเหมือนกันทุกตัว</p>
+                
+                <div class="example-box">
+                    <strong>เงื่อนไขของเซตที่เท่ากัน:</strong><br>
+                    1. มีสมาชิกเหมือนกันทุกตัว<br>
+                    2. ลำดับของสมาชิกไม่สำคัญ<br>
+                    3. ไม่มีสมาชิกซ้ำกัน
+                </div>
+
+                <div class="example-box">
+                    <strong>ตัวอย่าง:</strong><br>
+                    • A = {1, 2, 3} และ B = {3, 2, 1} → A = B<br>
+                    • C = {a, b, c} และ D = {a, b, c, c} → C = D<br>
+                    • E = {1, 2} และ F = {1, 2, 3} → E ≠ F
+                </div>
+
+                <div class="example-box">
+                    <strong>สัญลักษณ์:</strong><br>
+                    • A = B หมายถึง เซต A เท่ากับเซต B<br>
+                    • A ≠ B หมายถึง เซต A ไม่เท่ากับเซต B
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <h2 class="game-title">🎮 เกมจับคู่: หาเซตที่เท่ากัน</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 2rem;">คลิกเลือกเซตจากคอลัมน์ซ้าย แล้วจับคู่กับสัญลักษณ์ที่ถูกต้องในคอลัมน์ขวา</p>
+            
+            <div class="score-display">
+                คะแนน: <span id="gameScore">0</span> / 6
+            </div>
+
+            <div class="matching-container">
+                <div class="matching-column">
+                    <div class="column-title">เซตคู่</div>
+                </div>
+
+                <div class="matching-column">
+                    <div class="column-title">สัญลักษณ์</div>
+                </div>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+
+            <div class="buttons">
+                <button class="btn btn-primary" id="finishLessonBtn" onclick="finishLesson()">🎉 เสร็จสิ้นบทเรียน</button>
+                <button class="btn btn-secondary" onclick="resetGame()">🔄 เริ่มใหม่</button>
+                <button class="btn btn-secondary" onclick="goHome()">🏠 กลับเมนู</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // XP SYSTEM: Sync with localStorage and update live
+        function getXP() {
+            return parseInt(localStorage.getItem('setTheoryXP') || '0', 10);
+        }
+        function setXP(xp) {
+            localStorage.setItem('setTheoryXP', xp);
+            updateXPDisplay();
+        }
+        function addXP(amount) {
+            let xp = getXP();
+            xp += amount;
+            setXP(xp);
+        }
+        function updateXPDisplay() {
+            const xp = getXP();
+            const el = document.getElementById('xp-display');
+            if (el) el.textContent = `XP: ${xp}`;
+        }
+        window.addEventListener('DOMContentLoaded', updateXPDisplay);
+
+        // ข้อมูลเกม
+        let gameData = {
+            currentXP: 0,
+            stars: 0,
+            selectedPair: null,
+            selectedAnswer: null,
+            matches: [],
+            gameScore: 0
+        };
+
+        // คำตอบที่ถูกต้อง
+        const correctMatches = {
+            'pair1': 'pair1', // A = B
+            'pair2': 'pair2', // C ≠ D
+            'pair3': 'pair3', // E ≠ F
+            'pair4': 'pair4', // G = H
+            'pair5': 'pair5', // I = J
+            'pair6': 'pair6'  // K ≠ L
+        };
+
+        // เริ่มต้นเกม
+        function initGame() {
+            loadProgress();
+            updateUI();
+        }
+
+        // เลือกคู่เซต
+        function selectItem(element) {
+            // ล้างการเลือกก่อนหน้า
+            document.querySelectorAll('.matching-column:first-child .matching-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            element.classList.add('selected');
+            gameData.selectedPair = element.dataset.id;
+            playSound('click');
+
+            // ตรวจสอบการจับคู่
+            if (gameData.selectedAnswer) {
+                checkMatch();
+            }
+        }
+
+        // เลือกคำตอบ
+        function selectAnswer(element) {
+            // ล้างการเลือกก่อนหน้า
+            document.querySelectorAll('.matching-column:last-child .matching-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            element.classList.add('selected');
+            gameData.selectedAnswer = element.dataset.answer;
+            playSound('click');
+
+            // ตรวจสอบการจับคู่
+            if (gameData.selectedPair) {
+                checkMatch();
+            }
+        }
+
+        // ตรวจสอบการจับคู่
+        function checkMatch() {
+            if (gameData.selectedPair && gameData.selectedAnswer) {
+                const isCorrect = correctMatches[gameData.selectedPair] === gameData.selectedAnswer;
+                
+                const pairElement = document.querySelector(`[data-id="${gameData.selectedPair}"]`);
+                const answerElement = document.querySelector(`[data-answer="${gameData.selectedAnswer}"]`);
+
+                if (isCorrect) {
+                    // ถูกต้อง
+                    pairElement.classList.remove('selected');
+                    answerElement.classList.remove('selected');
+                    pairElement.classList.add('correct', 'disabled');
+                    answerElement.classList.add('correct', 'disabled');
+                    
+                    gameData.matches.push({
+                        pair: gameData.selectedPair,
+                        answer: gameData.selectedAnswer,
+                        correct: true
+                    });
+                    
+                    gameData.gameScore++;
+                    updateScore();
+                    playSound('success');
+                    
+                } else {
+                    // ผิด
+                    pairElement.classList.remove('selected');
+                    answerElement.classList.remove('selected');
+                    pairElement.classList.add('incorrect');
+                    answerElement.classList.add('incorrect');
+                    
+                    setTimeout(() => {
+                        pairElement.classList.remove('incorrect');
+                        answerElement.classList.remove('incorrect');
+                    }, 1000);
+                    
+                    playSound('error');
+                }
+
+                // รีเซ็ตการเลือก
+                gameData.selectedPair = null;
+                gameData.selectedAnswer = null;
+            }
+        }
+
+        // ตรวจสอบทั้งหมด
+        function checkAllMatches() {
+            if (gameData.gameScore === 6) {
+                // ผู้เล่นจับคู่ถูกครบทั้งหมด
+                gameData.currentXP += 150;
+                gameData.stars += 3;
+                
+                const resultMessage = document.getElementById('resultMessage');
+                resultMessage.textContent = '🎉 ยอดเยี่ยม! คุณจับคู่ถูกทุกคู่ เรียนรู้เรื่องเซตที่เท่ากันเป็นอย่างดี!';
+                resultMessage.className = 'result-message success';
+                resultMessage.style.display = 'block';
+                
+                // เล่นเสียงและแสดง confetti
+                playSound('complete');
+                showConfetti();
+                
+                // บันทึกความคืบหน้า
+                saveProgress();
+                
+            } else {
+                const resultMessage = document.getElementById('resultMessage');
+                resultMessage.textContent = `🎮 คุณจับคู่ถูกต้องแล้ว ${gameData.gameScore} คู่ จาก 6 คู่`;
+                resultMessage.className = 'result-message error';
+                resultMessage.style.display = 'block';
+                
+                playSound('click');
+            }
+            
+            updateUI();
+        }
+
+        // รีเซ็ตเกม
+        function resetGame() {
+            gameData.selectedPair = null;
+            gameData.selectedAnswer = null;
+            gameData.matches = [];
+            gameData.gameScore = 0;
+            
+            // รีเซ็ตทุกไอเท็ม
+            document.querySelectorAll('.matching-item').forEach(item => {
+                item.classList.remove('selected', 'correct', 'incorrect', 'disabled');
+            });
+            
+            // ซ่อนผลลัพธ์
+            document.getElementById('resultMessage').style.display = 'none';
+            
+            updateScore();
+            playSound('click');
+        }
+
+        // อัปเดตคะแนน
+        function updateScore() {
+            document.getElementById('gameScore').textContent = gameData.gameScore;
+        }
+
+        // อัปเดต UI
+        function updateUI() {
+            document.getElementById('currentXP').textContent = gameData.currentXP;
+            document.getElementById('currentStars').textContent = gameData.stars;
+            document.getElementById('progressFill').style.width = '37.5%'; // 3/8 lessons
+        }
+
+        // โหลดความคืบหน้า
+        function loadProgress() {
+            const saved = localStorage.getItem('setTheoryProgress');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                gameData.currentXP = savedData.totalXP || 0;
+                gameData.stars = savedData.totalStars || 0;
+            }
+        }
+
+        // บันทึกความคืบหน้า
+        function saveProgress() {
+            const saved = localStorage.getItem('setTheoryProgress');
+            let progressData = saved ? JSON.parse(saved) : {
+                totalXP: 0,
+                completedLessons: 0,
+                totalStars: 0,
+                lessonProgress: {}
+            };
+
+            progressData.totalXP = gameData.currentXP;
+            progressData.totalStars = gameData.stars;
+            progressData.lessonProgress[3] = {
+                completed: true,
+                xp: 150,
+                stars: 3
+            };
+
+            // นับบทเรียนที่เสร็จ
+            progressData.completedLessons = Object.keys(progressData.lessonProgress).length;
+
+            localStorage.setItem('setTheoryProgress', JSON.stringify(progressData));
+        }
+
+        // เล่นเสียง
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'success':
+                    oscillator.frequency.value = 659.25; // E5
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                    
+                case 'complete':
+                    // เสียงเมื่อทำเสร็จ
+                    oscillator.frequency.value = 523.25; // C5
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    
+                    setTimeout(() => {
+                        const osc2 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        osc2.frequency.value = 659.25; // E5
+                        osc2.type = 'sine';
+                        gain2.gain.value = 0.3;
+                        osc2.start();
+                        osc2.stop(audioContext.currentTime + 0.2);
+                        
+                        setTimeout(() => {
+                            const osc3 = audioContext.createOscillator();
+                            const gain3 = audioContext.createGain();
+                            osc3.connect(gain3);
+                            gain3.connect(audioContext.destination);
+                            osc3.frequency.value = 783.99; // G5
+                            osc3.type = 'sine';
+                            gain3.gain.value = 0.3;
+                            osc3.start();
+                            osc3.stop(audioContext.currentTime + 0.2);
+                        }, 150);
+                    }, 100);
+                    break;
+                    
+                case 'error':
+                    oscillator.frequency.value = 200;
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.value = 0.2;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                    
+                case 'click':
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+            }
+        }
+
+        // แสดง confetti
+        function showConfetti() {
+            const colors = ['#667eea', '#764ba2', '#4CAF50', '#ff6b6b', '#ffd93d'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 50);
+            }
+        }
+
+        // กลับหน้าหลัก
+        function goHome() {
+            playSound('click');
+            window.location.href = 'index.html';
+        }
+
+        // SHUFFLE MATCHING PAIRS AND ANSWERS
+        const matchingPairs = [
+            { id: 'pair1', html: 'A = {1, 2, 3}<br>B = {3, 2, 1}' },
+            { id: 'pair2', html: 'C = {a, b, c}<br>D = {a, b, d}' },
+            { id: 'pair3', html: 'E = {1, 2}<br>F = {1, 2, 3}' },
+            { id: 'pair4', html: 'G = {x, y, z}<br>H = {z, y, x}' },
+            { id: 'pair5', html: 'I = {1, 1, 2}<br>J = {1, 2}' },
+            { id: 'pair6', html: 'K = {∅}<br>L = { }' }
+        ];
+        const matchingAnswers = [
+            { id: 'pair1', html: 'A = B' },
+            { id: 'pair2', html: 'C ≠ D' },
+            { id: 'pair3', html: 'E ≠ F' },
+            { id: 'pair4', html: 'G = H' },
+            { id: 'pair5', html: 'I = J' },
+            { id: 'pair6', html: 'K ≠ L' },
+            // Trap/trick choices (do not match any pair)
+            { id: 'trap1', html: 'A ≠ B' },
+            { id: 'trap2', html: 'C = D' },
+            { id: 'trap3', html: 'E = F' },
+            { id: 'trap4', html: 'G ≠ H' },
+            { id: 'trap5', html: 'I ≠ J' },
+            { id: 'trap6', html: 'K = L' }
+        ];
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+        function renderMatchingGame() {
+            const leftCol = document.querySelector('.matching-column:first-child');
+            const rightCol = document.querySelector('.matching-column:last-child');
+            // Remove all except title
+            leftCol.innerHTML = '<div class="column-title">เซตคู่</div>';
+            rightCol.innerHTML = '<div class="column-title">สัญลักษณ์</div>';
+            shuffleArray(matchingPairs);
+            shuffleArray(matchingAnswers);
+            matchingPairs.forEach(pair => {
+                const div = document.createElement('div');
+                div.className = 'matching-item';
+                div.dataset.id = pair.id;
+                div.innerHTML = pair.html;
+                div.onclick = function() { selectItem(this); };
+                leftCol.appendChild(div);
+            });
+            // Show all (including traps)
+            matchingAnswers.forEach(ans => {
+                const div = document.createElement('div');
+                div.className = 'matching-item';
+                div.dataset.answer = ans.id;
+                div.innerHTML = ans.html;
+                div.onclick = function() { selectAnswer(this); };
+                rightCol.appendChild(div);
+            });
+        }
+        window.addEventListener('DOMContentLoaded', function() {
+            renderMatchingGame();
+            updateXPDisplay();
+        });
+
+        // เริ่มต้นเมื่อโหลดหน้า
+        window.addEventListener('load', initGame);
+
+        function finishLesson() {
+            if (gameData.gameScore === 6) {
+                // Prevent double XP
+                if (localStorage.getItem('lesson3_completed') === 'true') {
+                    alert('คุณได้ทำบทเรียนนี้ไปแล้ว XP จะไม่เพิ่มซ้ำ');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                // Add XP and mark as completed
+                let xp = parseInt(localStorage.getItem('setTheoryXP') || '0', 10);
+                xp += 100;
+                localStorage.setItem('setTheoryXP', xp);
+                localStorage.setItem('lesson3_completed', 'true');
+                // If index.html exposes setTheoryUtils, sync with it
+                if (window.opener && window.opener.setTheoryUtils) {
+                    window.opener.setTheoryUtils.addXP(100);
+                    window.opener.setTheoryUtils.completeLessonFromChild(3);
+                } else if (window.setTheoryUtils) {
+                    window.setTheoryUtils.addXP(100);
+                    window.setTheoryUtils.completeLessonFromChild(3);
+                }
+                alert('🎉 ยินดีด้วย! คุณเสร็จสิ้นบทเรียนที่ 3 แล้ว\nได้รับ 100 XP!');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                alert('⚠️ กรุณาจับคู่ให้ถูกต้องครบทุกข้อก่อนจบบทเรียน');
+            }
+        }
+    </script>
+</body>
+</html>

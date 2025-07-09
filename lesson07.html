@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 7: การดำเนินการของเซต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+    --primary-color: #4f46e5;
+    --secondary-color: #06b6d4;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --bg-light: #f8fafc;
+    --bg-white: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 87.5%;
+            transition: width 0.3s ease;
+        }
+
+        .lesson-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .xp-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: var(--success-color);
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .theory-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .theory-card h3 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .theory-content {
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .example-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .simulator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .sets-panel {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .sets-panel h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .set-display {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .set-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .set-content {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .operations-panel {
+            background: #f0f4ff;
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .operations-panel h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .operation-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .operation-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .operation-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .result-panel h4 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .result-content {
+            font-size: 1.5rem;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .explanation {
+            margin-top: 1rem;
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #667eea;
+            margin: 2rem 0;
+            font-weight: 600;
+        }
+
+        .sample-sets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .sample-btn {
+            background: #f8f9ff;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .sample-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .result-message {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .result-message.success {
+            background: #e8f5e8;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+        }
+
+        .result-message.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 2px solid #1976d2;
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .lesson-title {
+                font-size: 2rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .simulator-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sample-sets {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <h1 class="lesson-title">⚙️ บทที่ 7: การดำเนินการของเซต</h1>
+            <div class="xp-display" style="justify-content:center;">
+                <span id="xp-display">XP: 0</span>
+            </div>
+        </div>
+
+        <div class="theory-card">
+            <h3>🔧 ทฤษฎีการดำเนินการของเซต</h3>
+            <div class="theory-content">
+                <p><strong>การดำเนินการของเซต</strong> คือวิธีการรวม ตัด หรือหาผลต่างของเซต</p>
+                
+                <div class="example-box">
+                    <strong>1. เซตรวม (Union) A ∪ B</strong><br>
+                    เซตที่ประกอบด้วยสมาชิกที่อยู่ในเซต A หรือเซต B หรือทั้งคู่<br>
+                    ตัวอย่าง: {1,2} ∪ {2,3} = {1,2,3}
+                </div>
+
+                <div class="example-box">
+                    <strong>2. เซตตัด (Intersection) A ∩ B</strong><br>
+                    เซตที่ประกอบด้วยสมาชิกที่อยู่ในเซต A และเซต B พร้อมกัน<br>
+                    ตัวอย่าง: {1,2,3} ∩ {2,3,4} = {2,3}
+                </div>
+
+                <div class="example-box">
+                    <strong>3. เซตผลต่าง (Difference) A - B</strong><br>
+                    เซตที่ประกอบด้วยสมาชิกที่อยู่ในเซต A แต่ไม่อยู่ในเซต B<br>
+                    ตัวอย่าง: {1,2,3} - {2,3,4} = {1}
+                </div>
+
+                <div class="example-box">
+                    <strong>4. คอมพลีเมนต์ (Complement) A'</strong><br>
+                    เซตที่ประกอบด้วยสมาชิกของเซตเอกภพที่ไม่อยู่ในเซต A<br>
+                    ตัวอย่าง: ถ้า U = {1,2,3,4,5} และ A = {1,3} แล้ว A' = {2,4,5}
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <h2 class="game-title">🎮 เครื่องจำลองการดำเนินการของเซต</h2>
+            
+            <div class="score-display">
+                จำนวนการทดลอง: <span id="operationCount">0</span>/10
+                <div style="font-size:1rem;color:var(--text-secondary);margin-top:0.5rem;">
+        ทำการดำเนินการอย่างน้อย 10 ครั้งเพื่อปลดล็อกปุ่มจบบทเรียนและรับ XP
+    </div>
+            </div>
+
+            <div class="sample-sets">
+                <div class="sample-btn" onclick="loadSampleSets(1)">
+                    <strong>ตัวอย่าง 1</strong><br>
+                    A = {1, 2, 3}<br>
+                    B = {2, 3, 4}
+                </div>
+                <div class="sample-btn" onclick="loadSampleSets(2)">
+                    <strong>ตัวอย่าง 2</strong><br>
+                    A = {a, b, c, d}<br>
+                    B = {c, d, e, f}
+                </div>
+                <div class="sample-btn" onclick="loadSampleSets(3)">
+                    <strong>ตัวอย่าง 3</strong><br>
+                    A = {1, 3, 5, 7}<br>
+                    B = {2, 4, 6, 8}
+                </div>
+                <div class="sample-btn" onclick="loadSampleSets(4)">
+                    <strong>ตัวอย่าง 4</strong><br>
+                    A = {🍎, 🍊, 🍌}<br>
+                    B = {🍌, 🍓, 🥝}
+                </div>
+            </div>
+
+            <div class="simulator-container">
+                <div class="sets-panel">
+                    <h4>🎯 เซตที่ใช้ในการดำเนินการ</h4>
+                    
+                    <div class="set-display">
+                        <div class="set-label">เซต A</div>
+                        <div class="set-content" id="setA">{1, 2, 3}</div>
+                    </div>
+                    
+                    <div class="set-display">
+                        <div class="set-label">เซต B</div>
+                        <div class="set-content" id="setB">{2, 3, 4}</div>
+                    </div>
+                    
+                    <div class="set-display">
+                        <div class="set-label">เซตเอกภพ U</div>
+                        <div class="set-content" id="setU">{1, 2, 3, 4, 5}</div>
+                    </div>
+                </div>
+
+                <div class="operations-panel">
+                    <h4>⚙️ เลือกการดำเนินการ</h4>
+                    
+                    <button class="operation-btn" onclick="performOperation('union')">
+                        ∪ เซตรวม (A ∪ B)
+                    </button>
+                    
+                    <button class="operation-btn" onclick="performOperation('intersection')">
+                        ∩ เซตตัด (A ∩ B)
+                    </button>
+                    
+                    <button class="operation-btn" onclick="performOperation('differenceAB')">
+                        - เซตผลต่าง (A - B)
+                    </button>
+                    
+                    <button class="operation-btn" onclick="performOperation('differenceBA')">
+                        - เซตผลต่าง (B - A)
+                    </button>
+                    
+                    <button class="operation-btn" onclick="performOperation('complementA')">
+                        ' คอมพลีเมนต์ (A')
+                    </button>
+                    
+                    <button class="operation-btn" onclick="performOperation('complementB')">
+                        ' คอมพลีเมนต์ (B')
+                    </button>
+                </div>
+
+                <div class="result-panel" id="resultPanel" style="display: none;">
+                    <h4 id="operationTitle">ผลลัพธ์</h4>
+                    <div class="result-content" id="operationResult">{}</div>
+                    <div class="explanation" id="operationExplanation"></div>
+                </div>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+
+            <div class="buttons">
+                <button class="btn btn-primary" onclick="generateRandomSets()">🎲 สุ่มเซตใหม่</button>
+                <button class="btn btn-secondary" onclick="clearResult()">🗑️ ล้างผลลัพธ์</button>
+                <button class="btn btn-secondary" onclick="goHome()">🏠 กลับเมนู</button>
+                <button class="btn btn-primary" onclick="finishLesson()" id="finishLessonBtn">🎉 เสร็จสิ้นบทเรียน</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลเกม
+        let gameData = {
+            currentXP: 0,
+            stars: 0,
+            operationCount: 0,
+            currentSets: {
+                A: [1, 2, 3],
+                B: [2, 3, 4],
+                U: [1, 2, 3, 4, 5]
+            }
+        };
+
+        // ตัวอย่างเซต
+        const sampleSets = [
+            {
+                A: [1, 2, 3],
+                B: [2, 3, 4],
+                U: [1, 2, 3, 4, 5]
+            },
+            {
+                A: ['a', 'b', 'c', 'd'],
+                B: ['c', 'd', 'e', 'f'],
+                U: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+            },
+            {
+                A: [1, 3, 5, 7],
+                B: [2, 4, 6, 8],
+                U: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            },
+            {
+                A: ['🍎', '🍊', '🍌'],
+                B: ['🍌', '🍓', '🥝'],
+                U: ['🍎', '🍊', '🍌', '🍓', '🥝', '🍇', '🍑']
+            }
+        ];
+
+        // เริ่มต้นเกม
+        function initGame() {
+            loadProgress();
+            updateSetsDisplay();
+            updateOperationCount(); // <-- add this
+        }
+
+        // โหลดตัวอย่างเซต
+        function loadSampleSets(index) {
+            gameData.currentSets = { ...sampleSets[index - 1] };
+            updateSetsDisplay();
+            clearResult();
+            playSound('click');
+            updateOperationCount(); // <-- add this
+        }
+
+        // อัปเดตการแสดงเซต
+        function updateSetsDisplay() {
+            document.getElementById('setA').textContent = `{${gameData.currentSets.A.join(', ')}}`;
+            document.getElementById('setB').textContent = `{${gameData.currentSets.B.join(', ')}}`;
+            document.getElementById('setU').textContent = `{${gameData.currentSets.U.join(', ')}}`;
+        }
+
+        // ดำเนินการ
+        function performOperation(operation) {
+            // นับจำนวนการทดลองก่อน
+    gameData.operationCount++;
+    updateOperationCount();
+
+    const A = gameData.currentSets.A;
+    const B = gameData.currentSets.B;
+    const U = gameData.currentSets.U;
+    
+    let result = [];
+    let title = '';
+    let explanation = '';
+
+    switch(operation) {
+        case 'union':
+            result = [...new Set([...A, ...B])];
+            title = 'A ∪ B (เซตรวม)';
+            explanation = 'รวมสมาชิกทั้งหมดจากเซต A และ B โดยไม่นับซ้ำ';
+            break;
+        case 'intersection':
+            result = A.filter(x => B.includes(x));
+            title = 'A ∩ B (เซตตัด)';
+            explanation = 'สมาชิกที่อยู่ในทั้งเซต A และ B พร้อมกัน';
+            break;
+        case 'differenceAB':
+            result = A.filter(x => !B.includes(x));
+            title = 'A - B (เซตผลต่าง)';
+            explanation = 'สมาชิกที่อยู่ในเซต A แต่ไม่อยู่ในเซต B';
+            break;
+        case 'differenceBA':
+            result = B.filter(x => !A.includes(x));
+            title = 'B - A (เซตผลต่าง)';
+            explanation = 'สมาชิกที่อยู่ในเซต B แต่ไม่อยู่ในเซต A';
+            break;
+        case 'complementA':
+            result = U.filter(x => !A.includes(x));
+            title = "A' (คอมพลีเมนต์ของ A)";
+            explanation = 'สมาชิกของเซตเอกภพที่ไม่อยู่ในเซต A';
+            break;
+        case 'complementB':
+            result = U.filter(x => !B.includes(x));
+            title = "B' (คอมพลีเมนต์ของ B)";
+            explanation = 'สมาชิกของเซตเอกภพที่ไม่อยู่ในเซต B';
+            break;
+    }
+
+    // แสดงผลลัพธ์
+    document.getElementById('operationTitle').textContent = title;
+    document.getElementById('operationResult').textContent = 
+        result.length > 0 ? `{${result.join(', ')}}` : '∅ (เซตว่าง)';
+    document.getElementById('operationExplanation').textContent = explanation;
+    document.getElementById('resultPanel').style.display = 'block';
+
+    playSound('success');
+
+    // บันทึกความคืบหน้า
+    if (gameData.operationCount >= 10) {
+        saveProgress();
+        if (gameData.operationCount === 10) {
+            showMessage('🎉 ยินดีด้วย! คุณได้ทดลองการดำเนินการครบ 10 ครั้งแล้ว!', 'success');
+            showConfetti();
+        }
+    }
+}
+
+        // XP SYSTEM: Sync with localStorage and update live
+function getXP() {
+    return parseInt(localStorage.getItem('setTheoryXP') || '0', 10);
+}
+function setXP(xp) {
+    localStorage.setItem('setTheoryXP', xp);
+    updateXPDisplay();
+}
+function addXP(amount) {
+    let xp = getXP();
+    xp += amount;
+    setXP(xp);
+}
+function updateXPDisplay() {
+    const xp = getXP();
+    const el = document.getElementById('xp-display');
+    if (el) el.textContent = `XP: ${xp}`;
+}
+window.addEventListener('DOMContentLoaded', updateXPDisplay);
+
+        // สุ่มเซตใหม่
+        function generateRandomSets() {
+            const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            
+            // สุ่มขนาดเซต
+            const sizeA = Math.floor(Math.random() * 4) + 2; // 2-5 สมาชิก
+            const sizeB = Math.floor(Math.random() * 4) + 2; // 2-5 สมาชิก
+            
+            // สุ่มสมาชิกเซต A
+            const A = [];
+            while (A.length < sizeA) {
+                const num = numbers[Math.floor(Math.random() * numbers.length)];
+                if (!A.includes(num)) {
+                    A.push(num);
+                }
+            }
+            
+            // สุ่มสมาชิกเซต B
+            const B = [];
+            while (B.length < sizeB) {
+                const num = numbers[Math.floor(Math.random() * numbers.length)];
+                if (!B.includes(num)) {
+                    B.push(num);
+                }
+            }
+            
+            // สร้างเซตเอกภพ
+            const U = [...new Set([...A, ...B, ...numbers.slice(0, 8)])].sort((a, b) => a - b);
+            
+            gameData.currentSets = { A: A.sort((a, b) => a - b), B: B.sort((a, b) => a - b), U };
+            updateSetsDisplay();
+            clearResult();
+            playSound('click');
+            updateOperationCount(); // <-- add this
+        }
+
+        // ล้างผลลัพธ์
+        function clearResult() {
+            document.getElementById('resultPanel').style.display = 'none';
+            document.getElementById('resultMessage').style.display = 'none';
+        }
+
+        // แสดงข้อความ
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('resultMessage');
+            messageEl.textContent = message;
+            messageEl.className = `result-message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // อัปเดตจำนวนการดำเนินการ
+        function updateOperationCount() {
+            document.getElementById('operationCount').textContent = gameData.operationCount;
+            const finishBtn = document.getElementById('finishLessonBtn');
+            if (finishBtn) {
+                finishBtn.disabled = gameData.operationCount < 10;
+            }
+        }
+
+        // อัปเดต UI
+        function updateUI() {
+            document.getElementById('currentXP').textContent = gameData.currentXP;
+            document.getElementById('currentStars').textContent = gameData.stars;
+            document.getElementById('progressFill').style.width = '87.5%'; // 7/8 lessons
+        }
+
+        // โหลดความคืบหน้า
+        function loadProgress() {
+            const saved = localStorage.getItem('setTheoryProgress');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                gameData.currentXP = savedData.totalXP || 0;
+                gameData.stars = savedData.totalStars || 0;
+            }
+        }
+
+        // บันทึกความคืบหน้า
+        function saveProgress() {
+            const saved = localStorage.getItem('setTheoryProgress');
+            let progressData = saved ? JSON.parse(saved) : {
+                totalXP: 0,
+                completedLessons: 0,
+                totalStars: 0,
+                lessonProgress: {}
+            };
+
+            progressData.totalXP = gameData.currentXP;
+            progressData.totalStars = gameData.stars;
+            progressData.lessonProgress[7] = {
+                completed: true,
+                xp: gameData.currentXP,
+                stars: gameData.stars
+            };
+
+            // นับบทเรียนที่เสร็จ
+            progressData.completedLessons = Object.keys(progressData.lessonProgress).length;
+
+            localStorage.setItem('setTheoryProgress', JSON.stringify(progressData));
+        }
+
+        // เล่นเสียง
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'success':
+                    oscillator.frequency.value = 659.25;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                    
+                case 'click':
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+            }
+        }
+
+        // แสดง confetti
+        function showConfetti() {
+            const colors = ['#667eea', '#764ba2', '#4CAF50', '#ff6b6b', '#ffd93d'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 50);
+            }
+        }
+
+        // กลับหน้าหลัก
+        function goHome() {
+            playSound('click');
+            window.location.href = 'index.html';
+        }
+
+        // เริ่มต้นเมื่อโหลดหน้า
+        window.addEventListener('load', initGame);
+
+        function finishLesson() {
+    // Only allow if user has performed enough operations (customize as needed)
+    if (gameData.operationCount >= 10) {
+        // Prevent double XP
+        if (localStorage.getItem('lesson7_completed') === 'true') {
+            alert('คุณได้ทำบทเรียนนี้ไปแล้ว XP จะไม่เพิ่มซ้ำ');
+            window.location.href = 'index.html';
+            return;
+        }
+        // Add XP and mark as completed
+        addXP(100);
+        localStorage.setItem('lesson7_completed', 'true');
+        // Sync with index.html if possible
+        if (window.opener && window.opener.setTheoryUtils) {
+            window.opener.setTheoryUtils.addXP(100);
+            window.opener.setTheoryUtils.completeLessonFromChild(7);
+        } else if (window.setTheoryUtils) {
+            window.setTheoryUtils.addXP(100);
+            window.setTheoryUtils.completeLessonFromChild(7);
+        }
+        showConfetti();
+        document.getElementById('finishLessonBtn').disabled = true;
+        alert('🎉 ยินดีด้วย! คุณได้รับ 100 XP สำหรับบทเรียนนี้!');
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1200);
+    } else {
+        alert('กรุณาทดลองการดำเนินการอย่างน้อย 10 ครั้งก่อนจบบทเรียน!');
+    }
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 5: เพาเวอร์เซต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+    --primary-color: #4f46e5;
+    --secondary-color: #06b6d4;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --bg-light: #f8fafc;
+    --bg-white: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 62.5%;
+            transition: width 0.3s ease;
+        }
+
+        .lesson-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .xp-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .theory-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .theory-card h3 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .theory-content {
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .example-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .input-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .input-group input {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            width: 200px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .size-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .size-selector select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .generate-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .result-section {
+            margin-top: 2rem;
+        }
+
+        .set-display {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .set-display h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .set-content {
+            font-size: 1.1rem;
+            color: #333;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .powerset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .subset-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .subset-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .subset-item.empty {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .stats-display {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .result-message {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .result-message.success {
+            background: #e8f5e8;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+        }
+
+        .result-message.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 2px solid #1976d2;
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .lesson-title {
+                font-size: 2rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .input-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <h1 class="lesson-title">⚡ บทที่ 5: เพาเวอร์เซต</h1>
+            <div class="xp-display">
+                <span id="xp-display">XP: 0</span>
+            </div>
+        </div>
+
+        <div class="theory-card">
+            <h3>🔥 ทฤษฎีเพาเวอร์เซต</h3>
+            <div class="theory-content">
+                <p><strong>เพาเวอร์เซต (Power Set)</strong> คือเซตของสับเซตทั้งหมดของเซตหนึ่ง</p>
+                
+                <div class="example-box">
+                    <strong>คำนิยาม:</strong><br>
+                    P(A) = {X | X ⊆ A}<br>
+                    เพาเวอร์เซตของ A คือเซตที่ประกอบด้วยสับเซตทั้งหมดของ A
+                </div>
+
+                <div class="example-box">
+                    <strong>ตัวอย่าง:</strong><br>
+                    • A = {1, 2} → P(A) = {∅, {1}, {2}, {1,2}}<br>
+                    • B = {a} → P(B) = {∅, {a}}<br>
+                    • C = ∅ → P(C) = {∅}
+                </div>
+
+                <div class="example-box">
+                    <strong>สูตรสำคัญ:</strong><br>
+                    ถ้า |A| = n แล้ว |P(A)| = 2ⁿ<br>
+                    เพาเวอร์เซตของเซตที่มี n สมาชิก จะมี 2ⁿ สมาชิก
+                </div>
+
+                <div class="example-box">
+                    <strong>สมบัติ:</strong><br>
+                    1. ∅ ∈ P(A) เสมอ (เซตว่างเป็นสับเซตของเซตใดๆ)<br>
+                    2. A ∈ P(A) เสมอ (เซตเป็นสับเซตของตัวเอง)<br>
+                    3. P(∅) = {∅} (เพาเวอร์เซตของเซตว่างมี 1 สมาชิก)
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <h2 class="game-title">🎮 เครื่องมือสร้างเพาเวอร์เซต</h2>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <label>เซต A =</label>
+                    <input type="text" id="setInput" placeholder="เช่น a,b,c หรือ 1,2,3" maxlength="20">
+                </div>
+                <div class="size-selector">
+                    <label>หรือเลือกขนาด:</label>
+                    <select id="sizeSelector" onchange="generateRandomSet()">
+                        <option value="">-- เลือกขนาด --</option>
+                        <option value="1">1 สมาชิก</option>
+                        <option value="2">2 สมาชิก</option>
+                        <option value="3">3 สมาชิก</option>
+                        <option value="4">4 สมาชิก</option>
+                    </select>
+                </div>
+                <button class="generate-btn" onclick="generatePowerSet()">🚀 สร้างเพาเวอร์เซต</button>
+            </div>
+
+            <p style="text-align:center;margin-bottom:1rem;">
+    กรอกสมาชิกของเซต (คั่นด้วย ,) หรือเลือกขนาดเซต แล้วกด "สร้างเพาเวอร์เซต" <br>
+    <strong>ตัวอย่าง:</strong> a,b,c หรือ 1,2,3
+</p>
+
+            <div class="result-section" id="resultSection" style="display: none;">
+                <div class="set-display">
+                    <h4>เซตเดิม (A)</h4>
+                    <div class="set-content" id="originalSet"></div>
+                </div>
+
+                <div class="stats-display">
+                    <h4>📊 สถิติเพาเวอร์เซต</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="originalSize">0</div>
+                            <div class="stat-label">จำนวนสมาชิกของ A</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="powerSetSize">0</div>
+                            <div class="stat-label">จำนวนสมาชิกของ P(A)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="formula">2⁰</div>
+                            <div class="stat-label">สูตร 2ⁿ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="set-display">
+                    <h4>เพาเวอร์เซต P(A)</h4>
+                    <div class="powerset-grid" id="powerSetGrid"></div>
+                </div>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+
+            <div class="buttons">
+                <button class="btn btn-primary" onclick="runDemo()">🎯 ดูตัวอย่าง</button>
+                <button class="btn btn-secondary" onclick="clearAll()">🗑️ ล้างทั้งหมด</button>
+                <button class="btn btn-secondary" onclick="goHome()">🏠 กลับเมนู</button>
+            </div>
+
+            <div class="buttons" id="finishLessonSection" style="display:none;">
+                <button class="btn btn-primary" onclick="finishLesson()" id="finishLessonBtn">🎉 เสร็จสิ้นบทเรียน</button>
+                <button class="btn btn-secondary" onclick="goHome()">🏠 กลับเมนู</button>
+            </div>
+        </div>
+
+        <div style="color:#1976d2; text-align:center; margin-bottom:1rem;">
+    <strong>หมายเหตุ:</strong> สัญลักษณ์ <b>∅</b> (เซตว่าง) จะอยู่ในเพาเวอร์เซตเสมอ<br>
+    เพราะเซตว่างเป็นสับเซตของทุกเซตตามนิยามทางคณิตศาสตร์
+</div>
+    </div>
+
+    <script>
+        // ข้อมูลเกม
+        let gameData = {
+            currentXP: 0,
+            stars: 0,
+            generatedCount: 0
+        };
+
+        // เริ่มต้นเกม
+        function initGame() {
+            loadProgress();
+            updateUI();
+        }
+
+        // สร้างเซตแบบสุ่ม
+        function generateRandomSet() {
+            const size = parseInt(document.getElementById('sizeSelector').value);
+            if (!size) return;
+
+            const elements = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+            const randomElements = [];
+            
+            for (let i = 0; i < size; i++) {
+                randomElements.push(elements[i]);
+            }
+            
+            document.getElementById('setInput').value = randomElements.join(',');
+            playSound('click');
+        }
+
+        // สร้างเพาเวอร์เซต
+        function generatePowerSet() {
+            const input = document.getElementById('setInput').value.trim();
+            if (!input) {
+                showMessage('กรุณาใส่เซตหรือเลือกขนาดเซต', 'info');
+                return;
+            }
+            const elements = input.split(',').map(e => e.trim()).filter(e => e);
+            if (elements.length === 0) {
+                showMessage('กรุณาใส่สมาชิกของเซตให้ถูกต้อง', 'info');
+                return;
+            }
+            if (elements.length > 4) {
+                showMessage('จำกัดไม่เกิน 4 สมาชิก เพื่อให้เห็นผลลัพธ์ชัดเจน', 'info');
+                return;
+            }
+            const powerSet = generatePowerSetArray(elements);
+            displayResults(elements, powerSet);
+
+            // Show finish lesson button and award XP if not already completed
+            showFinishAndAwardXP();
+            playSound('success');
+        }
+
+        // สร้างเพาเวอร์เซตจริง
+        function generatePowerSetArray(elements) {
+            const n = elements.length;
+            const powerSet = [];
+            
+            // สร้าง 2^n สับเซต
+            for (let i = 0; i < Math.pow(2, n); i++) {
+                const subset = [];
+                for (let j = 0; j < n; j++) {
+                    // ตรวจสอบ bit ที่ j ของ i
+                    if (i & (1 << j)) {
+                        subset.push(elements[j]);
+                    }
+                }
+                powerSet.push(subset);
+            }
+            
+            return powerSet;
+        }
+
+        // แสดงผลลัพธ์
+        function displayResults(elements, powerSet) {
+            // แสดงเซตเดิม
+            document.getElementById('originalSet').textContent = `{${elements.join(', ')}}`;
+            
+            // แสดงสถิติ
+            document.getElementById('originalSize').textContent = elements.length;
+            document.getElementById('powerSetSize').textContent = powerSet.length;
+            document.getElementById('formula').textContent = `2^${elements.length}`;
+            
+            // แสดงเพาเวอร์เซต
+            const grid = document.getElementById('powerSetGrid');
+            grid.innerHTML = '';
+            
+            powerSet.forEach(subset => {
+                const item = document.createElement('div');
+                item.className = 'subset-item';
+                
+                if (subset.length === 0) {
+                    item.textContent = '∅';
+                    item.classList.add('empty');
+                } else {
+                    item.textContent = `{${subset.join(', ')}}`;
+                }
+                
+                grid.appendChild(item);
+            });
+            
+            // แสดงส่วนผลลัพธ์
+            document.getElementById('resultSection').style.display = 'block';
+        }
+
+        // รันตัวอย่าง
+        function runDemo() {
+            const demos = [
+                'a,b',
+                '1,2,3',
+                'x,y,z',
+                '🍎,🍊'
+            ];
+            
+            const randomDemo = demos[Math.floor(Math.random() * demos.length)];
+            document.getElementById('setInput').value = randomDemo;
+            document.getElementById('sizeSelector').value = '';
+            
+            setTimeout(() => {
+                generatePowerSet();
+            }, 500);
+            
+            playSound('click');
+        }
+
+        function showFinishAndAwardXP() {
+    const finishSection = document.getElementById('finishLessonSection');
+    finishSection.style.display = '';
+    // Award XP only once
+    if (localStorage.getItem('lesson5_completed') !== 'true') {
+        addXP(100);
+        localStorage.setItem('lesson5_completed', 'true');
+        // Sync with index.html if possible
+        if (window.opener && window.opener.setTheoryUtils) {
+            window.opener.setTheoryUtils.addXP(100);
+            window.opener.setTheoryUtils.completeLessonFromChild(5);
+        } else if (window.setTheoryUtils) {
+            window.setTheoryUtils.addXP(100);
+            window.setTheoryUtils.completeLessonFromChild(5);
+        }
+        showConfetti();
+        alert('🎉 ยินดีด้วย! คุณได้รับ 100 XP สำหรับบทเรียนนี้!');
+    }
+}
+
+        // ล้างทั้งหมด
+        function clearAll() {
+            document.getElementById('setInput').value = '';
+            document.getElementById('sizeSelector').value = '';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('resultMessage').style.display = 'none';
+            
+            playSound('click');
+        }
+
+        // แสดงข้อความ
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('resultMessage');
+            messageEl.textContent = message;
+            messageEl.className = `result-message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+
+        // อัปเดต UI
+        function updateUI() {
+            document.getElementById('currentXP').textContent = gameData.currentXP;
+            document.getElementById('currentStars').textContent = gameData.stars;
+            document.getElementById('progressFill').style.width = '62.5%'; // 5/8 lessons
+        }
+
+        // โหลดความคืบหน้า
+        function loadProgress() {
+            const saved = localStorage.getItem('setTheoryProgress');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                gameData.currentXP = savedData.totalXP || 0;
+                gameData.stars = savedData.totalStars || 0;
+            }
+        }
+
+        // บันทึกความคืบหน้า
+        function saveProgress() {
+            const saved = localStorage.getItem('setTheoryProgress');
+            let progressData = saved ? JSON.parse(saved) : {
+                totalXP: 0,
+                completedLessons: 0,
+                totalStars: 0,
+                lessonProgress: {}
+            };
+
+            progressData.totalXP = gameData.currentXP;
+            progressData.totalStars = gameData.stars;
+            progressData.lessonProgress[5] = {
+                completed: true,
+                xp: gameData.currentXP,
+                stars: gameData.stars
+            };
+
+            // นับบทเรียนที่เสร็จ
+            progressData.completedLessons = Object.keys(progressData.lessonProgress).length;
+
+            localStorage.setItem('setTheoryProgress', JSON.stringify(progressData));
+        }
+
+        // เล่นเสียง
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'success':
+                    oscillator.frequency.value = 659.25; // E5
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                    
+                case 'click':
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+            }
+        }
+
+        // แสดง confetti
+        function showConfetti() {
+            const colors = ['#667eea', '#764ba2', '#4CAF50', '#ff6b6b', '#ffd93d'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 50);
+            }
+        }
+
+        // กลับหน้าหลัก
+        function goHome() {
+            playSound('click');
+            window.location.href = 'index.html';
+        }
+
+        // XP SYSTEM: Sync with localStorage and update live
+function getXP() {
+    return parseInt(localStorage.getItem('setTheoryXP') || '0', 10);
+}
+function setXP(xp) {
+    localStorage.setItem('setTheoryXP', xp);
+    updateXPDisplay();
+}
+function addXP(amount) {
+    let xp = getXP();
+    xp += amount;
+    setXP(xp);
+}
+function updateXPDisplay() {
+    const xp = getXP();
+    const el = document.getElementById('xp-display');
+    if (el) el.textContent = `XP: ${xp}`;
+}
+window.addEventListener('DOMContentLoaded', updateXPDisplay);
+
+        // เริ่มต้นเมื่อโหลดหน้า
+        window.addEventListener('load', initGame);
+
+        function finishLesson() {
+    window.location.href = 'index.html';
+}
+    </script>
+</body>
+</html>
