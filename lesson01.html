@@ -196,6 +196,20 @@
             user-select: none;
         }
 
+        /* Visual feedback for hold-to-drag */
+        .draggable-item.holding {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
+
+        /* Enhanced drop zone feedback */
+        .drop-zone.dragover {
+            border-color: var(--primary-color);
+            background: #e0e7ff;
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -676,6 +690,8 @@
         let isDragging = false;
         let touchDraggedItem = null;
         let touchStartElement = null;
+        let holdTimer = null;
+        let hasMoved = false;
         
         function handleTouchStart(e) {
             e.preventDefault();
@@ -685,11 +701,65 @@
             touchStartTime = Date.now();
             touchStartElement = e.target;
             isDragging = false;
+            hasMoved = false;
             touchDraggedItem = e.target;
             
-            // Add visual feedback
-            e.target.style.transform = 'scale(1.1)';
-            e.target.style.zIndex = '1000';
+            // Add initial visual feedback
+            e.target.classList.add('holding');
+            
+            // Start hold timer for drag activation
+            holdTimer = setTimeout(() => {
+                if (touchDraggedItem && !hasMoved) {
+                    activateDragMode(touchDraggedItem);
+                }
+            }, 500); // 500ms hold to activate drag
+        }
+        
+        function activateDragMode(item) {
+            isDragging = true;
+            item.classList.remove('holding');
+            item.classList.add('dragging');
+            document.body.classList.add('dragging');
+            
+            // Add visual feedback for drag mode
+            item.style.transform = 'scale(1.2)';
+            item.style.zIndex = '1000';
+            item.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
+            
+            // Show drag instruction
+            showDragInstruction();
+        }
+        
+        function showDragInstruction() {
+            // Create or update instruction element
+            let instruction = document.getElementById('drag-instruction');
+            if (!instruction) {
+                instruction = document.createElement('div');
+                instruction.id = 'drag-instruction';
+                instruction.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: var(--primary-color);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    font-size: 14px;
+                    z-index: 2000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    pointer-events: none;
+                `;
+                document.body.appendChild(instruction);
+            }
+            instruction.textContent = '🖐️ ลากไปวางในเซตที่ต้องการ';
+        }
+        
+        function hideDragInstruction() {
+            const instruction = document.getElementById('drag-instruction');
+            if (instruction) {
+                instruction.remove();
+            }
         }
         
         function handleTouchMove(e) {
@@ -701,43 +771,56 @@
             const deltaY = touch.clientY - touchStartY;
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             
-            // Start dragging after moving 10px
-            if (distance > 10 && !isDragging) {
-                isDragging = true;
-                touchDraggedItem.classList.add('dragging');
-                document.body.classList.add('dragging');
+            // Mark as moved to cancel hold timer
+            if (distance > 5) {
+                hasMoved = true;
+                if (holdTimer) {
+                    clearTimeout(holdTimer);
+                    holdTimer = null;
+                }
             }
             
-            if (isDragging) {
-                // Move the dragged item with touch
-                touchDraggedItem.style.position = 'fixed';
-                touchDraggedItem.style.left = (touch.clientX - touchDraggedItem.offsetWidth / 2) + 'px';
-                touchDraggedItem.style.top = (touch.clientY - touchDraggedItem.offsetHeight / 2) + 'px';
-                touchDraggedItem.style.pointerEvents = 'none';
-                
-                // Highlight drop zones
-                const dropZones = document.querySelectorAll('.drop-zone');
-                dropZones.forEach(zone => {
-                    const rect = zone.getBoundingClientRect();
-                    if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-                        zone.classList.add('dragover');
-                    } else {
-                        zone.classList.remove('dragover');
-                    }
-                });
+            // If not in drag mode yet, don't move the item
+            if (!isDragging) {
+                return;
             }
+            
+            // Move the dragged item with touch
+            touchDraggedItem.style.position = 'fixed';
+            touchDraggedItem.style.left = (touch.clientX - touchDraggedItem.offsetWidth / 2) + 'px';
+            touchDraggedItem.style.top = (touch.clientY - touchDraggedItem.offsetHeight / 2) + 'px';
+            touchDraggedItem.style.pointerEvents = 'none';
+            
+            // Highlight drop zones
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                const rect = zone.getBoundingClientRect();
+                if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                    touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                    zone.classList.add('dragover');
+                    zone.style.transform = 'scale(1.02)';
+                } else {
+                    zone.classList.remove('dragover');
+                    zone.style.transform = 'scale(1)';
+                }
+            });
         }
         
         function handleTouchEnd(e) {
             e.preventDefault();
             if (!touchDraggedItem) return;
             
+            // Clear hold timer
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+            
             const touch = e.changedTouches[0];
             const deltaTime = Date.now() - touchStartTime;
             
-            // If it was a short tap (not a drag), treat as click for hint
-            if (deltaTime < 300 && !isDragging) {
+            // If it was a short tap and not dragging, treat as click for hint
+            if (deltaTime < 300 && !isDragging && !hasMoved) {
                 handleHintTouchOrClick(e);
             } else if (isDragging) {
                 // Find the drop zone under the touch
@@ -751,6 +834,7 @@
                         targetDropZone = zone;
                     }
                     zone.classList.remove('dragover');
+                    zone.style.transform = 'scale(1)';
                 });
                 
                 if (targetDropZone) {
@@ -773,6 +857,7 @@
                         newItem.style.transform = 'none';
                         newItem.style.zIndex = 'auto';
                         newItem.style.pointerEvents = 'auto';
+                        newItem.style.boxShadow = 'none';
                         
                         // Add remove-on-tap for dropped items
                         newItem.addEventListener('touchstart', function(e) {
@@ -785,50 +870,81 @@
                         
                         droppedItems.appendChild(newItem);
                         updateItemUsage();
+                        
+                        // Show success feedback
+                        showDropSuccess(targetDropZone);
                     }
                 }
             }
             
             // Reset dragged item
             if (touchDraggedItem) {
-                touchDraggedItem.classList.remove('dragging');
+                touchDraggedItem.classList.remove('dragging', 'holding');
                 touchDraggedItem.style.position = 'static';
                 touchDraggedItem.style.left = 'auto';
                 touchDraggedItem.style.top = 'auto';
                 touchDraggedItem.style.transform = 'none';
                 touchDraggedItem.style.zIndex = 'auto';
                 touchDraggedItem.style.pointerEvents = 'auto';
+                touchDraggedItem.style.boxShadow = 'none';
             }
             
             // Remove body dragging class
             document.body.classList.remove('dragging');
             
+            // Hide instruction
+            hideDragInstruction();
+            
             touchDraggedItem = null;
             isDragging = false;
             touchStartElement = null;
+            hasMoved = false;
+        }
+        
+        function showDropSuccess(dropZone) {
+            // Add a brief success animation
+            dropZone.style.background = '#d1fae5';
+            dropZone.style.borderColor = '#10b981';
+            setTimeout(() => {
+                dropZone.style.background = '';
+                dropZone.style.borderColor = '';
+            }, 500);
         }
         
         function handleTouchCancel(e) {
             e.preventDefault();
+            
+            // Clear hold timer
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+            
             if (touchDraggedItem) {
-                touchDraggedItem.classList.remove('dragging');
+                touchDraggedItem.classList.remove('dragging', 'holding');
                 touchDraggedItem.style.position = 'static';
                 touchDraggedItem.style.left = 'auto';
                 touchDraggedItem.style.top = 'auto';
                 touchDraggedItem.style.transform = 'none';
                 touchDraggedItem.style.zIndex = 'auto';
                 touchDraggedItem.style.pointerEvents = 'auto';
+                touchDraggedItem.style.boxShadow = 'none';
             }
             touchDraggedItem = null;
             isDragging = false;
             touchStartElement = null;
+            hasMoved = false;
             
             // Remove body dragging class
             document.body.classList.remove('dragging');
             
+            // Hide instruction
+            hideDragInstruction();
+            
             // Remove dragover from all zones
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 zone.classList.remove('dragover');
+                zone.style.transform = 'scale(1)';
             });
         }
         
@@ -958,17 +1074,29 @@
 
             // Reset any ongoing touch drag
             if (touchDraggedItem) {
-                touchDraggedItem.classList.remove('dragging');
+                touchDraggedItem.classList.remove('dragging', 'holding');
                 touchDraggedItem.style.position = 'static';
                 touchDraggedItem.style.left = 'auto';
                 touchDraggedItem.style.top = 'auto';
                 touchDraggedItem.style.transform = 'none';
                 touchDraggedItem.style.zIndex = 'auto';
                 touchDraggedItem.style.pointerEvents = 'auto';
+                touchDraggedItem.style.boxShadow = 'none';
             }
+            
+            // Clear hold timer
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+            
+            // Hide instruction
+            hideDragInstruction();
+            
             touchDraggedItem = null;
             isDragging = false;
             touchStartElement = null;
+            hasMoved = false;
 
             // Restore the drag pool (if needed)
             const dragItems = document.querySelector('.drag-items');
